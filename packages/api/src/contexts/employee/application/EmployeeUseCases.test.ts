@@ -45,7 +45,7 @@ describe('Employee Application Use Cases', () => {
                 firstName: 'Alice',
                 lastName: 'Smith',
                 email: 'alice@resttek.com',
-                passwordPlain: 'pass',
+                passwordPlain: 'password-uno-1',
                 role: 'manager',
                 restaurantId: 'r1'
             })
@@ -54,10 +54,23 @@ describe('Employee Application Use Cases', () => {
                 firstName: 'Bob',
                 lastName: 'Jones',
                 email: 'alice@resttek.com',
-                passwordPlain: 'pass2',
+                passwordPlain: 'password-dos-2',
                 role: 'camarero',
                 restaurantId: 'r1'
             })).rejects.toThrow('Email is already in use')
+        })
+    })
+
+    describe('CreateEmployeeUseCase (contraseña)', () => {
+        it('should reject a weak password', async () => {
+            await expect(createEmployeeUseCase.execute({
+                firstName: 'Alice',
+                lastName: 'Smith',
+                email: 'weak@resttek.com',
+                passwordPlain: 'corta',
+                role: 'manager',
+                restaurantId: 'r1'
+            })).rejects.toThrow('Password must be')
         })
     })
 

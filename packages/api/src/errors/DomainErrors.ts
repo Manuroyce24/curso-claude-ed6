@@ -174,3 +174,9 @@ export class InvalidOrderError extends AppError {
         super(message ?? 'Invalid order')
     }
 }
+
+export class WeakPasswordError extends AppError {
+    constructor() {
+        super('Password must be a string of 10 to 72 characters')
+    }
+}

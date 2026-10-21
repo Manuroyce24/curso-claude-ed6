@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto'
 import { Employee } from '@employee/domain/Employee.js'
 import type { IEmployeeRepository } from '@employee/domain/IEmployeeRepository.js'
 import type { IAuthService } from '@employee/domain/IAuthService.js'
+import { validatePlainPassword } from '@employee/domain/value-objects/Password.js'
 import { DuplicatedEmailError } from '@errors/DomainErrors.js'
 
 export interface CreateEmployeeDTO {
@@ -20,12 +21,14 @@ export class CreateEmployeeUseCase {
     ) {}
 
     async execute(dto: CreateEmployeeDTO): Promise<Employee> {
+        const password = validatePlainPassword(dto.passwordPlain)
+
         const existingEmployee = await this.employeeRepo.findByEmail(dto.email)
         if (existingEmployee) {
             throw new DuplicatedEmailError()
         }
 
-        const passwordHash = await this.authService.hashPassword(dto.passwordPlain)
+        const passwordHash = await this.authService.hashPassword(password)
 
         const employee = Employee.create({
             id: randomUUID(),
