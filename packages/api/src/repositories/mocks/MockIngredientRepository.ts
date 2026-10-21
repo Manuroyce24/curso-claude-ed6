@@ -8,6 +8,11 @@ export class MockIngredientRepository implements IngredientRepository {
         return this.ingredients.get(id) || null
     }
 
+    async findByIdInRestaurant(id: string, restaurantId: string): Promise<Ingredient | null> {
+        const ingredient = this.ingredients.get(id)
+        return ingredient && ingredient.restaurantId === restaurantId ? ingredient : null
+    }
+
     async findByRestaurantId(restaurantId: string): Promise<Ingredient[]> {
         return Array.from(this.ingredients.values())
             .filter(i => i.restaurantId === restaurantId)

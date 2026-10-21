@@ -14,6 +14,7 @@ interface IngredientRow {
 
 export interface IngredientRepository {
     findById(id: string): Promise<Ingredient | null>
+    findByIdInRestaurant(id: string, restaurantId: string): Promise<Ingredient | null>
     findByRestaurantId(restaurantId: string): Promise<Ingredient[]>
     save(ingredient: Ingredient): Promise<void>
     delete(id: string): Promise<void>
@@ -26,6 +27,15 @@ export class SqliteIngredientRepository implements IngredientRepository {
         const row = await this.db.get<IngredientRow>(
             'SELECT id, name, unit, current_stock as currentStock, restaurant_id as restaurantId, created_at as createdAt, updated_at as updatedAt FROM ingredients WHERE id = ?',
             [id]
+        )
+        if (!row) return null
+        return this.mapToIngredient(row)
+    }
+
+    async findByIdInRestaurant(id: string, restaurantId: string): Promise<Ingredient | null> {
+        const row = await this.db.get<IngredientRow>(
+            'SELECT id, name, unit, current_stock as currentStock, restaurant_id as restaurantId, created_at as createdAt, updated_at as updatedAt FROM ingredients WHERE id = ? AND restaurant_id = ?',
+            [id, restaurantId]
         )
         if (!row) return null
         return this.mapToIngredient(row)

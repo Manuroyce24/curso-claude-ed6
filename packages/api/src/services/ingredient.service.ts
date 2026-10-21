@@ -36,8 +36,8 @@ export class IngredientService {
         return ingredient
     }
 
-    async update(id: string, dto: UpdateIngredientDTO): Promise<Ingredient> {
-        const existing = await this.ingredientRepository.findById(id)
+    async update(restaurantId: string, id: string, dto: UpdateIngredientDTO): Promise<Ingredient> {
+        const existing = await this.ingredientRepository.findByIdInRestaurant(id, restaurantId)
         if (!existing) {
             throw new IngredientNotFoundError()
         }
@@ -56,16 +56,16 @@ export class IngredientService {
         return updated
     }
 
-    async delete(id: string): Promise<void> {
-        const existing = await this.ingredientRepository.findById(id)
+    async delete(restaurantId: string, id: string): Promise<void> {
+        const existing = await this.ingredientRepository.findByIdInRestaurant(id, restaurantId)
         if (!existing) {
             throw new IngredientNotFoundError()
         }
         await this.ingredientRepository.delete(id)
     }
 
-    async findById(id: string): Promise<Ingredient | null> {
-        return this.ingredientRepository.findById(id)
+    async findById(restaurantId: string, id: string): Promise<Ingredient | null> {
+        return this.ingredientRepository.findByIdInRestaurant(id, restaurantId)
     }
 
     async findByRestaurantId(restaurantId: string): Promise<Ingredient[]> {

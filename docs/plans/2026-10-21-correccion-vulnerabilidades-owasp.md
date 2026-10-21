@@ -108,7 +108,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 
 - [x] **T14** (~10 min): Crear `authorizeRestaurant` (admin o `user.restaurantId === params.restaurantId`) — `middlewares.ts`
 - [x] **T15** (~10 min): Añadir `AND restaurant_id = ?` a `findById`/`update`/`delete` de platos y ajustar el servicio — `dish.repository.ts`, `dish.service.ts`
-- [ ] **T16** (~10 min): Lo mismo para ingredientes — `ingredient.repository.ts`, `ingredient.service.ts`
+- [x] **T16** (~10 min): Lo mismo para ingredientes — `ingredient.repository.ts`, `ingredient.service.ts`
 - [ ] **T17** (~5 min): Aplicar `authorizeRestaurant` en las rutas de platos, ingredientes y empleados del restaurante — `dish.routes.ts`, `ingredient.routes.ts`, `restaurant-employee.routes.ts`
 - [ ] **T18** (~5 min): Restringir `GET /restaurants/:id` a admin o personal de ese restaurante — `restaurant.routes.ts`
 - [ ] **T19** (~5 min): Actualizar los mocks de repositorios — `repositories/mocks/`
