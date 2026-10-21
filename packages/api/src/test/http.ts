@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken'
 import { dbConfig } from '@config/database.js'
 
-export const JWT_SECRET_TEST = process.env.JWT_SECRET ?? 'super-secret-resttek-key'
+import { JWT_SECRET } from '@config/env.js'
+
+export const JWT_SECRET_TEST = JWT_SECRET
 
 export interface UsuarioTest {
     id: string

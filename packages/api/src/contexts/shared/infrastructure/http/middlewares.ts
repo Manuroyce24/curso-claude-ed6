@@ -1,7 +1,6 @@
 import type { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
-
-const JWT_SECRET: string = process.env.JWT_SECRET || 'super-secret-resttek-key'
+import { JWT_SECRET } from '@config/env.js'
 
 export interface AuthUser {
     id: string
@@ -28,7 +27,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     }
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET)
+        const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] })
         req.user = decoded as AuthUser
         next()
     } catch {
