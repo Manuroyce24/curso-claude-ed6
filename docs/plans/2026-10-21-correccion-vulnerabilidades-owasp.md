@@ -141,7 +141,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 - [x] **T34** (~5 min): Aplicar `roleGuard` con `data.roles` a `cocina`, `barra` y `salon` — `web-empleados/src/app/app.routes.ts`
 - [ ] **T35** (~10 min): Comprobar `exp` del JWT en `isAuthenticated` y envolver `JSON.parse` en `try/catch` — `web-shared/.../auth.store.ts`
 - [x] **T36** (~10 min): Parar el polling en `ngOnDestroy`, evitar doble `startPolling` y pararlo al cerrar sesión o tras un 401 — `order.store.ts`, páginas de `orders/pages`
-- [ ] **T37** (~5 min): Dejar de leer `restaurantId` de `localStorage` para las llamadas (la API lo toma del JWT) — `order.service.ts`
+- [x] **T37** (~5 min): Dejar de leer `restaurantId` de `localStorage` para las llamadas (la API lo toma del JWT) — `order.service.ts`
 - [ ] **T38** (~5 min): Mostrar mensajes genéricos en lugar de `err.message` — `order.store.ts`
 - [ ] **T39** (~10 min): Actualizar `@angular/*` a la última versión parcheada de 21.x y ejecutar `ng build` — `package.json`
 - [ ] **T40** (~10 min): Activar `security.autoCsp` en `angular.json` y alojar la fuente Inter en local para no abrir `style-src`/`font-src` a terceros — `angular.json`, `styles.css`
