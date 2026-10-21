@@ -3,8 +3,14 @@ import jwt from 'jsonwebtoken'
 
 const JWT_SECRET: string = process.env.JWT_SECRET || 'super-secret-resttek-key'
 
+export interface AuthUser {
+    id: string
+    role: string
+    restaurantId?: string | null
+}
+
 export interface AuthRequest extends Request {
-    user?: any
+    user?: AuthUser
 }
 
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction): void => {
@@ -23,7 +29,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET)
-        req.user = decoded
+        req.user = decoded as AuthUser
         next()
     } catch {
         res.status(401).json({ error: 'Unauthorized: Invalid token' })

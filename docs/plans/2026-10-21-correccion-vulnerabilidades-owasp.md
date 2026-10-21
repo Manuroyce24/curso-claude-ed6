@@ -90,7 +90,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 
 **Bloque 1 — Autorización de `/orders` (crítica)**
 
-- [ ] **T4** (~5 min): Tipar `AuthRequest.user` (`id`, `role`, `restaurantId?`) en lugar de `any` — `middlewares.ts`
+- [x] **T4** (~5 min): Tipar `AuthRequest.user` (`id`, `role`, `restaurantId?`) en lugar de `any` — `middlewares.ts`
 - [ ] **T5** (~10 min): Añadir `restaurantId` al contexto de `getById`, `listActive` y `updateItemStatus` y lanzar `OrderNotFoundError` si el pedido no pertenece al usuario o a su restaurante — `order.service.ts`
 - [ ] **T6** (~5 min): Añadir un error de dominio `ForbiddenError` y su traducción en `errorHandler` — `errors/DomainErrors.ts`, `errorHandler.ts`
 - [ ] **T7** (~10 min): En `createOrder`, validar `items` y `quantity` (entero 1–50) y que cada `dishId` exista y sea del restaurante — `order.service.ts`
