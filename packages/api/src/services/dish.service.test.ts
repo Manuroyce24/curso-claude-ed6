@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { DishService } from './dish.service.js'
 import { MockDishRepository } from '@repositories/mocks/MockDishRepository.js'
-import { DishNotFoundError } from '@errors/DomainErrors.js'
+import { DishNotFoundError, InvalidPriceError } from '@errors/DomainErrors.js'
 
 const datos = { name: 'Paella', description: null, price: 12, category: 'principal', available: true, ingredients: [] }
 
@@ -37,5 +37,14 @@ describe('DishService (aislamiento por restaurante)', () => {
         expect((await repo.findById(idPlatoB))?.name).toBe('Nueva')
         await service.delete('rest-b', idPlatoB)
         expect(await repo.findById(idPlatoB)).toBeNull()
+    })
+
+    it.each([NaN, Infinity, -Infinity, -1, 0, '12' as unknown as number, null as unknown as number])('rechaza el precio %s', async (price) => {
+        await expect(service.create({ ...datos, price, restaurantId: 'rest-a' })).rejects.toThrow(InvalidPriceError)
+    })
+
+    it('acepta un precio positivo y finito', async () => {
+        const dish = await service.create({ ...datos, price: 9.5, restaurantId: 'rest-a' })
+        expect(dish.price).toBe(9.5)
     })
 })

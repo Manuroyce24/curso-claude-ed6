@@ -100,7 +100,7 @@ export class DishService {
         if (!props.name || props.name.trim() === '') {
             throw new DishNameRequiredError()
         }
-        if (props.price <= 0) {
+        if (typeof props.price !== 'number' || !Number.isFinite(props.price) || props.price <= 0) {
             throw new InvalidPriceError()
         }
         if (!props.restaurantId || props.restaurantId.trim() === '') {
