@@ -153,7 +153,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 Depende del Bloque 2 (secreto y `issuer`/`audience`). Se ejecuta antes de las tareas de frontend T35 y T36.
 
 - [x] **T44** (~10 min): Crear la tabla `refresh_tokens` (`id`, `employee_id`, `family_id`, `token_hash`, `expires_at`, `revoked_at`, `replaced_by`, `created_at`) con índice en `token_hash` — `config/database.ts`
-- [ ] **T45** (~10 min): Puerto `RefreshTokenRepository` (`save`, `findByHash`, `revoke`, `revokeFamily`, `revokeAllByEmployee`) — `contexts/employee/domain/`
+- [x] **T45** (~10 min): Puerto `RefreshTokenRepository` (`save`, `findByHash`, `revoke`, `revokeFamily`, `revokeAllByEmployee`) — `contexts/employee/domain/`
 - [ ] **T46** (~10 min): Implementación SQLite con consultas parametrizadas — `contexts/employee/infrastructure/SqliteRefreshTokenRepository.ts`
 - [ ] **T47** (~5 min): Generar el refresh con `crypto.randomBytes(32)` y guardar solo su hash SHA-256 — `BcryptAuthService.ts`
 - [ ] **T48** (~5 min): Reducir la expiración del access JWT a 15 min (configurable) — `BcryptAuthService.ts`
