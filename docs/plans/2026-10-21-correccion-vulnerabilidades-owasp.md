@@ -127,7 +127,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 - [x] **T26** (~5 min): CORS con lista blanca (`CORS_ORIGINS`) y `express.json({ limit: '100kb' })` — `app.ts`
 - [x] **T27** (~5 min): Limitar `limit` a 100 en el listado de empleados — `EmployeeController.ts`
 - [x] **T28** (~5 min): Validar `price` (número finito > 0) — `dish.service.ts`
-- [ ] **T29** (~5 min): Validar el esquema `http(s)` de `logoUrl` — `restaurant.service.ts`
+- [x] **T29** (~5 min): Validar el esquema `http(s)` de `logoUrl` — `restaurant.service.ts`
 - [ ] **T30** (~5 min): Devolver 400 para JSON malformado — `errorHandler.ts`
 
 **Bloque 6 — Dependencias y repositorio (alta/baja)**

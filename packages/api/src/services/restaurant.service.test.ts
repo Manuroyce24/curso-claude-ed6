@@ -84,6 +84,22 @@ describe('RestaurantService', () => {
         })
     })
 
+    describe('logoUrl', () => {
+        it.each(['javascript:alert(1)', 'data:text/html;base64,AAAA', 'ftp://x.com/a.png', 'no es una url', 'file:///etc/passwd'])(
+            'should reject %s', async (logoUrl) => {
+                await expect(service.create({ ...validDTO, logoUrl })).rejects.toThrow('Invalid logo URL')
+            })
+
+        it('should accept http and https URLs', async () => {
+            expect((await service.create({ ...validDTO, logoUrl: 'https://ejemplo.com/logo.png' })).logoUrl)
+                .toBe('https://ejemplo.com/logo.png')
+        })
+
+        it('should treat an empty string as no logo', async () => {
+            expect((await service.create({ ...validDTO, logoUrl: '' })).logoUrl).toBeNull()
+        })
+    })
+
     describe('update', () => {
         it('should update an existing restaurant', async () => {
             const created = await service.create(validDTO)

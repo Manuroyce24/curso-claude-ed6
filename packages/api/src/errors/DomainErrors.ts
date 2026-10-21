@@ -180,3 +180,9 @@ export class WeakPasswordError extends AppError {
         super('Password must be a string of 10 to 72 characters')
     }
 }
+
+export class InvalidLogoUrlError extends AppError {
+    constructor() {
+        super('Invalid logo URL: must be an http or https URL')
+    }
+}
