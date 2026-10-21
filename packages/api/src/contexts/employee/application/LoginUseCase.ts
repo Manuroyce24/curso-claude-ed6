@@ -33,8 +33,10 @@ export class LoginUseCase {
     async execute(dto: LoginDTO): Promise<LoginResponse> {
         const employee = await this.employeeRepository.findByEmail(Email.normalize(dto.email))
 
+        // bcrypt lanza una excepción (500) si recibe algo que no sea un string.
+        const candidata = typeof dto.passwordRaw === 'string' ? dto.passwordRaw : ''
         const isValid = await this.authService.comparePasswords(
-            dto.passwordRaw,
+            candidata,
             employee?.passwordHash ?? HASH_FICTICIO
         )
         if (!employee || !isValid) {

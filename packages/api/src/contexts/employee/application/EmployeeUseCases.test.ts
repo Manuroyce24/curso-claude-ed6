@@ -113,6 +113,15 @@ describe('Employee Application Use Cases', () => {
             expect(spy).toHaveBeenCalledOnce()
         })
 
+        it('should answer InvalidCredentialsError when the password is not a string', async () => {
+            const spy = vi.spyOn(authService, 'comparePasswords')
+
+            await expect(loginUseCase.execute({ email: 'nadie@resttek.com', passwordRaw: undefined as any }))
+                .rejects.toThrow(InvalidCredentialsError)
+
+            expect(spy).toHaveBeenCalledWith('', expect.any(String))
+        })
+
         it('should find the employee ignoring email case', async () => {
             await employeeRepo.save(Employee.create({
                 id: 'e-case',
