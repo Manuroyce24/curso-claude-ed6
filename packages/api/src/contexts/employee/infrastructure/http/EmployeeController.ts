@@ -3,6 +3,8 @@ import type { CreateEmployeeUseCase } from '@employee/application/CreateEmployee
 import type { IEmployeeRepository } from '@employee/domain/IEmployeeRepository.js'
 import { EmployeeNotFoundError } from '@errors/DomainErrors.js'
 
+const MAX_LIMIT = 100
+
 export class EmployeeController {
     constructor(
         private createEmployeeUseCase: CreateEmployeeUseCase,
@@ -35,8 +37,9 @@ export class EmployeeController {
 
     listEmployees = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const limit = parseInt(req.query.limit as string) || 10
-            const offset = parseInt(req.query.offset as string) || 0
+            const solicitado = parseInt(req.query.limit as string)
+            const limit = solicitado > 0 ? Math.min(solicitado, MAX_LIMIT) : 10
+            const offset = Math.max(parseInt(req.query.offset as string) || 0, 0)
             const role = req.query.role as string
 
             const employees = await this.employeeRepository.findAll(limit, offset, role)

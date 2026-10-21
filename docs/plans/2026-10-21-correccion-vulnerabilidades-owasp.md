@@ -125,7 +125,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 
 - [x] **T25** (~5 min): Instalar `helmet` y añadirlo; `app.disable('x-powered-by')` — `app.ts`
 - [x] **T26** (~5 min): CORS con lista blanca (`CORS_ORIGINS`) y `express.json({ limit: '100kb' })` — `app.ts`
-- [ ] **T27** (~5 min): Limitar `limit` a 100 en el listado de empleados — `EmployeeController.ts`
+- [x] **T27** (~5 min): Limitar `limit` a 100 en el listado de empleados — `EmployeeController.ts`
 - [ ] **T28** (~5 min): Validar `price` (número finito > 0) — `dish.service.ts`
 - [ ] **T29** (~5 min): Validar el esquema `http(s)` de `logoUrl` — `restaurant.service.ts`
 - [ ] **T30** (~5 min): Devolver 400 para JSON malformado — `errorHandler.ts`
