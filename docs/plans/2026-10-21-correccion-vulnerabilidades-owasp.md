@@ -117,7 +117,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 
 - [x] **T20** (~5 min): Instalar `express-rate-limit` y aplicarlo a `/auth/login` y `/auth/register` — `auth.routes.ts`, `package.json`
 - [x] **T21** (~10 min): Validar la contraseña (string, longitud mínima 10) en registro y creación de empleado — `RegisterClientUseCase.ts`, `CreateEmployeeUseCase.ts`
-- [ ] **T22** (~5 min): Normalizar el email a minúsculas — `Email.ts`
+- [x] **T22** (~5 min): Normalizar el email a minúsculas — `Email.ts`
 - [ ] **T23** (~10 min): En el login, ejecutar `bcrypt.compare` contra un hash ficticio si el usuario no existe — `LoginUseCase.ts`
 - [ ] **T24** (~5 min): Hacer que `seed.ts` no se ejecute con `NODE_ENV=production` y dejar constancia en el README de que la contraseña del seed es el email — `scripts/seed.ts`, `README.md`
 

@@ -103,6 +103,21 @@ describe('Employee Application Use Cases', () => {
             })).rejects.toThrow('Invalid credentials')
         })
 
+        it('should find the employee ignoring email case', async () => {
+            await employeeRepo.save(Employee.create({
+                id: 'e-case',
+                firstName: 'Case',
+                lastName: 'Test',
+                email: 'case@resttek.com',
+                passwordHash: 'hashed_password123',
+                role: 'manager',
+                restaurantId: 'r1'
+            }))
+
+            const result = await loginUseCase.execute({ email: 'CASE@Resttek.com', passwordRaw: 'password123' })
+            expect(result.employee.id).toBe('e-case')
+        })
+
         it('should throw InvalidCredentialsError for wrong password', async () => {
             const employee = Employee.create({
                 id: '123',

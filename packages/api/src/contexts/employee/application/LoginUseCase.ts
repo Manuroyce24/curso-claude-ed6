@@ -1,3 +1,4 @@
+import { Email } from '@shared/domain/value-objects/Email.js'
 import type { IEmployeeRepository } from '@employee/domain/IEmployeeRepository.js'
 import type { IAuthService } from '@employee/domain/IAuthService.js'
 import { InvalidCredentialsError } from '@errors/DomainErrors.js'
@@ -26,7 +27,7 @@ export class LoginUseCase {
     ) {}
 
     async execute(dto: LoginDTO): Promise<LoginResponse> {
-        const employee = await this.employeeRepository.findByEmail(dto.email)
+        const employee = await this.employeeRepository.findByEmail(Email.normalize(dto.email))
 
         if (!employee) {
             throw new InvalidCredentialsError()

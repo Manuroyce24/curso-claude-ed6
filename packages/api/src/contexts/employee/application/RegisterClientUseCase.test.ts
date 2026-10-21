@@ -85,4 +85,18 @@ describe('RegisterClientUseCase', () => {
             email: 'john@example.com'
         } as any)).rejects.toThrow(WeakPasswordError)
     })
+
+    it('should look up and store the email normalized', async () => {
+        vi.mocked(mockEmployeeRepo.findByEmail!).mockResolvedValue(null)
+
+        const result = await useCase.execute({
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'John@Example.COM',
+            password: 'password1234'
+        })
+
+        expect(mockEmployeeRepo.findByEmail).toHaveBeenCalledWith('john@example.com')
+        expect(result.employee.email).toBe('john@example.com')
+    })
 })

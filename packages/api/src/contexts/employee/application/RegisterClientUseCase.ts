@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto'
 import { Employee } from '@employee/domain/Employee.js'
+import { Email } from '@shared/domain/value-objects/Email.js'
 import type { IEmployeeRepository } from '@employee/domain/IEmployeeRepository.js'
 import type { IAuthService } from '@employee/domain/IAuthService.js'
 import { validatePlainPassword } from '@employee/domain/value-objects/Password.js'
@@ -33,7 +34,7 @@ export class RegisterClientUseCase {
     async execute(dto: RegisterClientDTO): Promise<RegisterClientResponse> {
         const password = validatePlainPassword(dto.password)
 
-        const existingEmployee = await this.employeeRepo.findByEmail(dto.email)
+        const existingEmployee = await this.employeeRepo.findByEmail(Email.normalize(dto.email))
         if (existingEmployee) {
             throw new DuplicatedEmailError()
         }
