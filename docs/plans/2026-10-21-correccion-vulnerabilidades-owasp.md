@@ -86,7 +86,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 
 - [ ] **T1** (~10 min): Arrancar la API con el seed y reproducir con `curl` la lectura de un pedido ajeno y el cambio de estado desde un token `cliente` — `packages/api`
 - [ ] **T2** (~5 min): Reproducir con `curl` el acceso a `PUT /restaurants/A/dishes/<id de B>` con un manager de A — `packages/api`
-- [ ] **T3** (~5 min): Ejecutar `npm audit --omit=dev` y guardar el resultado como línea base — raíz
+- [x] **T3** (~5 min): Ejecutar `npm audit --omit=dev` y guardar el resultado como línea base — raíz
 
 **Bloque 1 — Autorización de `/orders` (crítica)**
 
