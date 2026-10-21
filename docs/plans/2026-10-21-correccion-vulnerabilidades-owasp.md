@@ -145,7 +145,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 - [x] **T38** (~5 min): Mostrar mensajes genéricos en lugar de `err.message` — `order.store.ts`
 - [x] **T39** (~10 min): Actualizar `@angular/*` a la última versión parcheada de 21.x y ejecutar `ng build` — `package.json`
 - [x] **T40** (~10 min): Activar `security.autoCsp` en `angular.json` y alojar la fuente Inter en local para no abrir `style-src`/`font-src` a terceros — `angular.json`, `styles.css`
-- [ ] **T40b** (~10 min): Definir la CSP completa (`default-src 'self'`, `script-src` con nonce/hash, `connect-src 'self'`, `frame-ancestors 'none'`, `object-src 'none'`) y probarla en modo `Content-Security-Policy-Report-Only` antes de aplicarla — `index.html`/configuración del servidor
+- [x] **T40b** (~10 min): Definir la CSP completa (`default-src 'self'`, `script-src` con nonce/hash, `connect-src 'self'`, `frame-ancestors 'none'`, `object-src 'none'`) y probarla en modo `Content-Security-Policy-Report-Only` antes de aplicarla — `index.html`/configuración del servidor
 - [ ] **T41** (~5 min): Documentar las cabeceras de seguridad y el uso de HTTPS en producción — `docs/arquitectura/`
 
 **Bloque 8 — Refresh token con revocación (media)**
