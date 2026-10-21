@@ -29,8 +29,8 @@ export class OrderStore {
     try {
       const orders = await firstValueFrom(this.orderService.getActiveOrders());
       this._orders.set(orders);
-    } catch (err: any) {
-      this._error.set(err.message || 'Error al cargar pedidos');
+    } catch (err: unknown) {
+      this._error.set(this.mensajeDeError(err, 'No se pudieron cargar los pedidos.'));
     } finally {
       this._loading.set(false);
     }
@@ -52,8 +52,8 @@ export class OrderStore {
           return order;
         })
       );
-    } catch (err: any) {
-      this._error.set(err.message || 'Error al actualizar estado');
+    } catch (err: unknown) {
+      this._error.set(this.mensajeDeError(err, 'No se pudo actualizar el estado del plato.'));
     }
   }
 
@@ -71,5 +71,13 @@ export class OrderStore {
       clearInterval(this.pollingInterval);
       this.pollingInterval = null;
     }
+  }
+
+  // No se muestra HttpErrorResponse.message: incluye la URL interna de la API.
+  private mensajeDeError(err: unknown, porDefecto: string): string {
+    const estado = (err as { status?: number })?.status;
+    if (estado === 403) return 'No tienes permiso para realizar esta acción.';
+    if (estado === 404) return 'El pedido ya no existe.';
+    return porDefecto;
   }
 }
