@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest'
 import { Database } from '@config/database.js'
+import { SqliteEmployeeRepository } from '@employee/infrastructure/SqliteEmployeeRepository.js'
 import { SqliteRefreshTokenRepository } from '@employee/infrastructure/SqliteRefreshTokenRepository.js'
 import type { RefreshTokenRecord } from '@employee/domain/IRefreshTokenRepository.js'
 
@@ -77,5 +78,17 @@ describe('SqliteRefreshTokenRepository', () => {
         expect((await repo.findByHash('hash-e1'))?.revokedAt).not.toBeNull()
         expect((await repo.findByHash('hash-e2'))?.revokedAt).not.toBeNull()
         expect((await repo.findByHash('hash-o1'))?.revokedAt).toBeNull()
+    })
+
+    it('al eliminar un empleado se eliminan sus refresh tokens (ON DELETE CASCADE)', async () => {
+        await db.run(
+            'INSERT INTO employees (id, first_name, last_name, email, password_hash, role, restaurant_id) VALUES (?, ?, ?, ?, ?, ?, NULL)',
+            ['emp-baja', 'N', 'A', 'baja@resttek.com', 'hash', 'cliente']
+        )
+        await repo.save(registro('b1', 'emp-baja', 'fam-b', 'hash-b1'))
+
+        await new SqliteEmployeeRepository(db).delete('emp-baja')
+
+        expect(await repo.findByHash('hash-b1')).toBeNull()
     })
 })
