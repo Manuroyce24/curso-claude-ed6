@@ -143,7 +143,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 - [x] **T36** (~10 min): Parar el polling en `ngOnDestroy`, evitar doble `startPolling` y pararlo al cerrar sesión o tras un 401 — `order.store.ts`, páginas de `orders/pages`
 - [x] **T37** (~5 min): Dejar de leer `restaurantId` de `localStorage` para las llamadas (la API lo toma del JWT) — `order.service.ts`
 - [x] **T38** (~5 min): Mostrar mensajes genéricos en lugar de `err.message` — `order.store.ts`
-- [ ] **T39** (~10 min): Actualizar `@angular/*` a la última versión parcheada de 21.x y ejecutar `ng build` — `package.json`
+- [x] **T39** (~10 min): Actualizar `@angular/*` a la última versión parcheada de 21.x y ejecutar `ng build` — `package.json`
 - [ ] **T40** (~10 min): Activar `security.autoCsp` en `angular.json` y alojar la fuente Inter en local para no abrir `style-src`/`font-src` a terceros — `angular.json`, `styles.css`
 - [ ] **T40b** (~10 min): Definir la CSP completa (`default-src 'self'`, `script-src` con nonce/hash, `connect-src 'self'`, `frame-ancestors 'none'`, `object-src 'none'`) y probarla en modo `Content-Security-Policy-Report-Only` antes de aplicarla — `index.html`/configuración del servidor
 - [ ] **T41** (~5 min): Documentar las cabeceras de seguridad y el uso de HTTPS en producción — `docs/arquitectura/`
