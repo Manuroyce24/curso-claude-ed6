@@ -56,6 +56,8 @@ npm run seed
 
 Este comando ejecuta el script `packages/api/src/scripts/seed.ts`, que crea restaurantes, empleados, ingredientes, platos y pedidos de ejemplo.
 
+> **Solo para desarrollo.** Las cuentas del seed usan su propio email como contraseña, así que el script se niega a ejecutarse con `NODE_ENV=production`. La política de contraseñas de la API (10 a 72 caracteres) no se aplica a estas cuentas de ejemplo.
+
 ---
 
 ## Arrancar el Entorno de Desarrollo

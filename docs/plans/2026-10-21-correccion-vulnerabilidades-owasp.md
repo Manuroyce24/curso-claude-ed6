@@ -119,7 +119,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 - [x] **T21** (~10 min): Validar la contraseña (string, longitud mínima 10) en registro y creación de empleado — `RegisterClientUseCase.ts`, `CreateEmployeeUseCase.ts`
 - [x] **T22** (~5 min): Normalizar el email a minúsculas — `Email.ts`
 - [x] **T23** (~10 min): En el login, ejecutar `bcrypt.compare` contra un hash ficticio si el usuario no existe — `LoginUseCase.ts`
-- [ ] **T24** (~5 min): Hacer que `seed.ts` no se ejecute con `NODE_ENV=production` y dejar constancia en el README de que la contraseña del seed es el email — `scripts/seed.ts`, `README.md`
+- [x] **T24** (~5 min): Hacer que `seed.ts` no se ejecute con `NODE_ENV=production` y dejar constancia en el README de que la contraseña del seed es el email — `scripts/seed.ts`, `README.md`
 
 **Bloque 5 — Validación y configuración HTTP (media)**
 
