@@ -159,7 +159,7 @@ Depende del Bloque 2 (secreto y `issuer`/`audience`). Se ejecuta antes de las ta
 - [x] **T48** (~5 min): Reducir la expiración del access JWT a 15 min (configurable) — `BcryptAuthService.ts`
 - [x] **T49** (~10 min): `LoginUseCase` crea la familia y devuelve `refreshToken` junto al access — `LoginUseCase.ts`
 - [x] **T50** (~10 min): `RefreshTokenUseCase`: valida hash y caducidad, rota, y si el token ya estaba revocado revoca la familia y responde 401 — `contexts/employee/application/RefreshTokenUseCase.ts`
-- [ ] **T51** (~5 min): `LogoutUseCase` que revoca el refresh recibido (idempotente) — `contexts/employee/application/LogoutUseCase.ts`
+- [x] **T51** (~5 min): `LogoutUseCase` que revoca el refresh recibido (idempotente) — `contexts/employee/application/LogoutUseCase.ts`
 - [ ] **T52** (~5 min): Revocar todos los refresh del empleado al cambiar su rol o eliminarlo — casos de uso de empleados
 - [ ] **T53** (~10 min): Controlador y rutas `POST /auth/refresh` y `POST /auth/logout`, con rate limit propio — `auth.routes.ts`, controlador de auth
 - [ ] **T54** (~5 min): Registrar los casos de uso y el repositorio — `contexts/employee/infrastructure/dependencies.ts`
