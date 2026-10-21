@@ -1,3 +1,4 @@
+import { createHash, randomBytes } from 'crypto'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { JWT_SECRET, JWT_ISSUER, JWT_AUDIENCE } from '@config/env.js'
@@ -21,5 +22,13 @@ export class BcryptAuthService implements IAuthService {
             issuer: JWT_ISSUER,
             audience: JWT_AUDIENCE
         })
+    }
+
+    generateRefreshToken(): string {
+        return randomBytes(32).toString('base64url')
+    }
+
+    hashRefreshToken(token: string): string {
+        return createHash('sha256').update(token).digest('hex')
     }
 }

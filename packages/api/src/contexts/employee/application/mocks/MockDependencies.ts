@@ -51,4 +51,15 @@ export class MockAuthService implements IAuthService {
     generateToken(payload: any): string {
         return `fake-jwt-token-for-${payload.id}`
     }
+
+    private contador = 0
+
+    generateRefreshToken(): string {
+        this.contador += 1
+        return `refresh-token-${this.contador}`
+    }
+
+    hashRefreshToken(token: string): string {
+        return `hash(${token})`
+    }
 }
