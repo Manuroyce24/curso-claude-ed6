@@ -102,7 +102,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 - [x] **T10** (~5 min): Crear `config/env.ts` que exija `JWT_SECRET` (≥32 caracteres) y falle al arrancar; en `NODE_ENV=test` usar un valor fijo de test — `packages/api/src/config/env.ts`
 - [x] **T11** (~5 min): Reemplazar el secreto duplicado en `middlewares.ts` y fijar `algorithms:['HS256']` — `middlewares.ts`
 - [x] **T12** (~5 min): Reemplazar el secreto en `BcryptAuthService.ts` y añadir `issuer`/`audience` (verificarlos en `authenticate`) — `BcryptAuthService.ts`
-- [ ] **T13** (~5 min): Documentar `JWT_SECRET` y crear `.env.example` — `README.md`, `packages/api/.env.example`
+- [x] **T13** (~5 min): Documentar `JWT_SECRET` y crear `.env.example` — `README.md`, `packages/api/.env.example`
 
 **Bloque 3 — Aislamiento por restaurante (alta)**
 

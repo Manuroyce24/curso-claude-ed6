@@ -35,7 +35,18 @@ npm install
 
 Esto instala las dependencias de todos los paquetes: `api`, `web-admin`, `web-clientes`, `web-empleados` y `web-shared`.
 
-### 3. Poblar la base de datos
+### 3. Configurar las variables de entorno
+
+La API **no arranca** sin un secreto JWT. Crea `packages/api/.env` a partir de la plantilla y rellena `JWT_SECRET` (mínimo 32 caracteres):
+
+```bash
+cp packages/api/.env.example packages/api/.env
+node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"   # pega el resultado en JWT_SECRET
+```
+
+El archivo `.env` está en `.gitignore`. Cambiar `JWT_SECRET` invalida todas las sesiones abiertas.
+
+### 4. Poblar la base de datos
 
 La API usa SQLite. Las tablas se crean automáticamente al iniciar el servidor, pero necesitas datos de prueba:
 
