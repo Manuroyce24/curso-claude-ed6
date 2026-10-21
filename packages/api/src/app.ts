@@ -12,12 +12,18 @@ import publicDishRoutes from '@routes/dish.public.routes.js'
 import orderRoutes from '@routes/order.routes.js'
 import { errorHandler } from '@shared/infrastructure/http/errorHandler.js'
 
+const ORIGENES_POR_DEFECTO = 'http://localhost:4200,http://localhost:4201,http://localhost:4202'
+const origenesPermitidos = (process.env.CORS_ORIGINS ?? ORIGENES_POR_DEFECTO)
+    .split(',')
+    .map(origen => origen.trim())
+    .filter(Boolean)
+
 const app = express()
 
 app.disable('x-powered-by')
 app.use(helmet())
-app.use(cors())
-app.use(express.json())
+app.use(cors({ origin: origenesPermitidos }))
+app.use(express.json({ limit: '100kb' }))
 
 app.use('/api/v1/orders', orderRoutes)
 app.use('/api/v1/auth', authRoutes)
