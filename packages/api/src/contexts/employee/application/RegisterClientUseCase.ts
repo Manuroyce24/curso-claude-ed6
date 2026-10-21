@@ -3,6 +3,7 @@ import { Employee } from '@employee/domain/Employee.js'
 import { Email } from '@shared/domain/value-objects/Email.js'
 import type { IEmployeeRepository } from '@employee/domain/IEmployeeRepository.js'
 import type { IAuthService } from '@employee/domain/IAuthService.js'
+import type { TokenIssuer } from '@employee/application/TokenIssuer.js'
 import { validatePlainPassword } from '@employee/domain/value-objects/Password.js'
 import { DuplicatedEmailError } from '@errors/DomainErrors.js'
 
@@ -15,6 +16,7 @@ export interface RegisterClientDTO {
 
 export interface RegisterClientResponse {
     token: string
+    refreshToken: string
     employee: {
         id: string
         firstName: string
@@ -28,7 +30,8 @@ export interface RegisterClientResponse {
 export class RegisterClientUseCase {
     constructor(
         private readonly employeeRepo: IEmployeeRepository,
-        private readonly authService: IAuthService
+        private readonly authService: IAuthService,
+        private readonly tokenIssuer: TokenIssuer
     ) {}
 
     async execute(dto: RegisterClientDTO): Promise<RegisterClientResponse> {
@@ -53,7 +56,7 @@ export class RegisterClientUseCase {
 
         await this.employeeRepo.save(employee)
 
-        const token = this.authService.generateToken({
+        const { token, refreshToken } = await this.tokenIssuer.issue({
             id: employee.id,
             role: employee.role,
             restaurantId: employee.restaurantId
@@ -61,6 +64,7 @@ export class RegisterClientUseCase {
 
         return {
             token,
+            refreshToken,
             employee: {
                 id: employee.id,
                 firstName: employee.firstName,

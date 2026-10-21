@@ -2,12 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { RegisterClientUseCase } from '@employee/application/RegisterClientUseCase.js'
 import type { IEmployeeRepository } from '@employee/domain/IEmployeeRepository.js'
 import type { IAuthService } from '@employee/domain/IAuthService.js'
+import { TokenIssuer } from '@employee/application/TokenIssuer.js'
+import { MockRefreshTokenRepository } from '@employee/application/mocks/MockDependencies.js'
 import { DuplicatedEmailError, WeakPasswordError } from '@errors/DomainErrors.js'
 
 describe('RegisterClientUseCase', () => {
     let mockEmployeeRepo: Partial<IEmployeeRepository>
     let mockAuthService: Partial<IAuthService>
     let useCase: RegisterClientUseCase
+    let refreshRepo: MockRefreshTokenRepository
 
     beforeEach(() => {
         mockEmployeeRepo = {
@@ -16,11 +19,15 @@ describe('RegisterClientUseCase', () => {
         }
         mockAuthService = {
             hashPassword: vi.fn().mockResolvedValue('hashedPassword'),
-            generateToken: vi.fn().mockReturnValue('mockToken')
+            generateToken: vi.fn().mockReturnValue('mockToken'),
+            generateRefreshToken: vi.fn().mockReturnValue('mockRefresh'),
+            hashRefreshToken: vi.fn().mockReturnValue('mockRefreshHash')
         }
+        refreshRepo = new MockRefreshTokenRepository()
         useCase = new RegisterClientUseCase(
             mockEmployeeRepo as IEmployeeRepository,
-            mockAuthService as IAuthService
+            mockAuthService as IAuthService,
+            new TokenIssuer(mockAuthService as IAuthService, refreshRepo)
         )
     })
 
@@ -35,6 +42,8 @@ describe('RegisterClientUseCase', () => {
         })
 
         expect(result.token).toBe('mockToken')
+        expect(result.refreshToken).toBe('mockRefresh')
+        expect(refreshRepo.records[0]).toMatchObject({ tokenHash: 'mockRefreshHash' })
         expect(result.employee).toMatchObject({
             firstName: 'John',
             lastName: 'Doe',

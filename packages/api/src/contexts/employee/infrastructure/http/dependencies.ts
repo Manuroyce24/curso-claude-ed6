@@ -15,7 +15,7 @@ const refreshTokenRepository = new SqliteRefreshTokenRepository(dbConfig)
 const tokenIssuer = new TokenIssuer(authService, refreshTokenRepository)
 const loginUseCase = new LoginUseCase(employeeRepository, authService, tokenIssuer)
 const createEmployeeUseCase = new CreateEmployeeUseCase(employeeRepository, authService)
-const registerClientUseCase = new RegisterClientUseCase(employeeRepository, authService)
+const registerClientUseCase = new RegisterClientUseCase(employeeRepository, authService, tokenIssuer)
 
 export const authController = new AuthController(loginUseCase, registerClientUseCase)
 export const employeeController = new EmployeeController(
