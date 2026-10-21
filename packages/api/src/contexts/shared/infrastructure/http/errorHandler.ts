@@ -14,7 +14,8 @@ const FORBIDDEN_ERRORS = [
 ]
 
 const UNAUTHORIZED_ERRORS = [
-    'InvalidCredentialsError'
+    'InvalidCredentialsError',
+    'InvalidRefreshTokenError'
 ]
 
 export const errorHandler = (err: any, _req: Request, res: Response, _next: NextFunction): void => {

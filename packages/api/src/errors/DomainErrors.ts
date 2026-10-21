@@ -186,3 +186,9 @@ export class InvalidLogoUrlError extends AppError {
         super('Invalid logo URL: must be an http or https URL')
     }
 }
+
+export class InvalidRefreshTokenError extends AppError {
+    constructor() {
+        super('Invalid or expired refresh token')
+    }
+}
