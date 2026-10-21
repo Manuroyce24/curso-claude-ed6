@@ -168,3 +168,9 @@ export class ForbiddenError extends AppError {
         super('Forbidden: insufficient permissions')
     }
 }
+
+export class InvalidOrderError extends AppError {
+    constructor(message?: string) {
+        super(message ?? 'Invalid order')
+    }
+}

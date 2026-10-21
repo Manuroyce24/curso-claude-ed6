@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { OrderService } from './order.service.js'
 import { MockOrderRepository } from '@repositories/mocks/MockOrderRepository.js'
+import { MockDishRepository } from '@repositories/mocks/MockDishRepository.js'
 import type { Order } from '@models/order.model.js'
-import { OrderNotFoundError, InvalidOrderStatusError, ForbiddenError } from '@errors/DomainErrors.js'
+import { OrderNotFoundError, InvalidOrderStatusError, ForbiddenError, InvalidOrderError } from '@errors/DomainErrors.js'
 import type { Actor } from './order.service.js'
 
 const cocinero: Actor = { id: 'emp-1', role: 'cocinero', restaurantId: 'rest-1' }
@@ -18,7 +19,7 @@ describe('OrderService.updateItemStatus', () => {
 
     beforeEach(async () => {
         repo = new MockOrderRepository()
-        service = new OrderService(repo)
+        service = new OrderService(repo, new MockDishRepository())
 
         testOrder = {
             id: 'order-1',
@@ -110,5 +111,56 @@ describe('OrderService.updateItemStatus', () => {
             const orders = await service.listActive(admin, 'rest-1')
             expect(orders).toHaveLength(1)
         })
+    })
+})
+
+
+describe('OrderService.create', () => {
+    let service: OrderService
+    let dishRepo: MockDishRepository
+
+    const plato = (id: string, restaurantId: string) => ({
+        id, name: id, description: null, price: 5, category: 'principal' as const,
+        available: true, restaurantId, ingredients: [], createdAt: '', updatedAt: ''
+    })
+    const pedido = (items: unknown) => ({
+        restaurantId: 'rest-1', tableId: null, clientId: 'cli-1',
+        items: items as { dishId: string, quantity: number, notes: string | null }[]
+    })
+
+    beforeEach(async () => {
+        dishRepo = new MockDishRepository()
+        await dishRepo.save(plato('dish-1', 'rest-1'))
+        await dishRepo.save(plato('dish-otro', 'rest-2'))
+        service = new OrderService(new MockOrderRepository(), dishRepo)
+    })
+
+    it('should create one item per unit', async () => {
+        const order = await service.create(pedido([{ dishId: 'dish-1', quantity: 2, notes: null }]))
+        expect(order.items).toHaveLength(2)
+    })
+
+    it.each([
+        ['items ausente', undefined],
+        ['items vacío', []],
+        ['items no es un array', 'x'],
+        ['demasiadas líneas', Array.from({ length: 51 }, () => ({ dishId: 'dish-1', quantity: 1, notes: null }))]
+    ])('should reject %s', async (_nombre, items) => {
+        await expect(service.create(pedido(items))).rejects.toThrow(InvalidOrderError)
+    })
+
+    it.each([0, -1, 1.5, 51, 1e9, '3', null])('should reject quantity %s', async (quantity) => {
+        await expect(service.create(pedido([{ dishId: 'dish-1', quantity, notes: null }])))
+            .rejects.toThrow(InvalidOrderError)
+    })
+
+    it('should reject a dish that does not exist', async () => {
+        await expect(service.create(pedido([{ dishId: 'nope', quantity: 1, notes: null }])))
+            .rejects.toThrow(InvalidOrderError)
+    })
+
+    it('should reject a dish from another restaurant', async () => {
+        await expect(service.create(pedido([{ dishId: 'dish-otro', quantity: 1, notes: null }])))
+            .rejects.toThrow(InvalidOrderError)
     })
 })

@@ -2,7 +2,11 @@ import { randomUUID } from 'crypto'
 import type { Order, OrderItem } from '@models/order.model.js'
 import { normalizeOrderStatus } from '@models/order.model.js'
 import type { OrderRepository } from '@repositories/order.repository.js'
-import { RestaurantIdRequiredError, OrderNotFoundError, ForbiddenError } from '@errors/DomainErrors.js'
+import type { DishRepository } from '@repositories/dish.repository.js'
+import { RestaurantIdRequiredError, OrderNotFoundError, ForbiddenError, InvalidOrderError } from '@errors/DomainErrors.js'
+
+const MAX_LINEAS_PEDIDO = 50
+const MAX_UNIDADES_POR_LINEA = 50
 
 export interface Actor {
     id: string
@@ -26,12 +30,17 @@ export interface CreateOrderRequest {
 }
 
 export class OrderService {
-    constructor(private readonly orderRepository: OrderRepository) {}
+    constructor(
+        private readonly orderRepository: OrderRepository,
+        private readonly dishRepository: DishRepository
+    ) {}
 
     async create(request: CreateOrderRequest): Promise<Order> {
         if (!request.restaurantId || request.restaurantId.trim() === '') {
             throw new RestaurantIdRequiredError()
         }
+
+        await this.validarLineas(request)
 
         const items: OrderItem[] = []
         for (const item of request.items) {
@@ -58,6 +67,25 @@ export class OrderService {
         await this.orderRepository.create(order)
 
         return order
+    }
+
+    private async validarLineas(request: CreateOrderRequest): Promise<void> {
+        const lineas: unknown = request.items
+        if (!Array.isArray(lineas) || lineas.length === 0 || lineas.length > MAX_LINEAS_PEDIDO) {
+            throw new InvalidOrderError(`Items must be a list of 1 to ${MAX_LINEAS_PEDIDO} lines`)
+        }
+
+        for (const linea of lineas) {
+            const { dishId, quantity } = (linea ?? {}) as { dishId?: unknown, quantity?: unknown }
+            if (typeof quantity !== 'number' || !Number.isInteger(quantity)
+                || quantity < 1 || quantity > MAX_UNIDADES_POR_LINEA) {
+                throw new InvalidOrderError(`Quantity must be an integer between 1 and ${MAX_UNIDADES_POR_LINEA}`)
+            }
+            const dish = typeof dishId === 'string' ? await this.dishRepository.findById(dishId) : null
+            if (!dish || dish.restaurantId !== request.restaurantId) {
+                throw new InvalidOrderError('Dish does not belong to the restaurant')
+            }
+        }
     }
 
     async listActive(actor: Actor, requestedRestaurantId?: string): Promise<Order[]> {
