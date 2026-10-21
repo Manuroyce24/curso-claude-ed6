@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { dbConfig } from '@config/database.js'
 
-import { JWT_SECRET } from '@config/env.js'
+import { JWT_SECRET, JWT_ISSUER, JWT_AUDIENCE } from '@config/env.js'
 
 export const JWT_SECRET_TEST = JWT_SECRET
 
@@ -12,7 +12,7 @@ export interface UsuarioTest {
 }
 
 export const tokenDe = (usuario: UsuarioTest): string =>
-    jwt.sign(usuario, JWT_SECRET_TEST, { expiresIn: '1h' })
+    jwt.sign(usuario, JWT_SECRET_TEST, { expiresIn: '1h', algorithm: 'HS256', issuer: JWT_ISSUER, audience: JWT_AUDIENCE })
 
 export const bearer = (usuario: UsuarioTest): [string, string] =>
     ['Authorization', `Bearer ${tokenDe(usuario)}`]

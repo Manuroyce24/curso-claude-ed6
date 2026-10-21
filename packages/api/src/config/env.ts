@@ -14,3 +14,6 @@ export function leerJwtSecret(origen: Record<string, string | undefined>): strin
 }
 
 export const JWT_SECRET: string = leerJwtSecret(process.env)
+
+export const JWT_ISSUER = 'resttek-api'
+export const JWT_AUDIENCE = 'resttek-app'
