@@ -16,6 +16,7 @@ erDiagram
     ingredients ||--o{ dish_ingredients : "usado en"
     orders ||--o{ order_items : "contiene"
     dishes ||--o{ order_items : "pedido como"
+    employees ||--o{ refresh_tokens : "tiene"
 
     restaurants {
         TEXT id PK
@@ -83,6 +84,17 @@ erDiagram
         INTEGER quantity
         TEXT notes
         TEXT status
+    }
+
+    refresh_tokens {
+        TEXT id PK
+        TEXT employee_id FK
+        TEXT family_id
+        TEXT token_hash UK
+        TEXT expires_at
+        TEXT revoked_at
+        TEXT replaced_by
+        TEXT created_at
     }
 ```
 
@@ -212,6 +224,28 @@ Líneas de pedido. Cada ítem es un plato con cantidad y estado.
 **Restricciones:**
 
 - ON DELETE CASCADE desde `orders.id`.
+
+---
+
+### `refresh_tokens`
+
+Tokens de refresco de las sesiones. Solo se guarda el hash SHA-256 del token, nunca el token.
+
+| Columna | Tipo | Nullable | Descripción |
+| --- | --- | --- | --- |
+| `id` | TEXT | No | UUID, clave primaria |
+| `employee_id` | TEXT | No | FK → `employees.id` |
+| `family_id` | TEXT | No | Agrupa los tokens de una misma sesión (cada login abre una familia) |
+| `token_hash` | TEXT | No | SHA-256 del token, único e indexado |
+| `expires_at` | TEXT | No | Caducidad (ISO 8601) |
+| `revoked_at` | TEXT | Sí | Cuándo se revocó (rotación, logout o reutilización detectada) |
+| `replaced_by` | TEXT | Sí | `id` del token que lo sustituyó al rotar |
+| `created_at` | TEXT | No | Fecha de creación |
+
+**Restricciones:**
+
+- ON DELETE CASCADE desde `employees.id`.
+- Reutilizar un token ya revocado revoca toda su familia.
 
 ---
 

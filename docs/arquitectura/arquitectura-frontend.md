@@ -132,12 +132,14 @@ web-shared/src/
 └── lib/
     ├── tokens.ts             → InjectionToken API_URL
     ├── auth/
-    │   ├── auth.service.ts   → Login, register, logout
-    │   ├── auth.store.ts     → Signal-based state (token, user)
-    │   └── auth.guard.ts     → Protección de rutas
+    │   ├── auth.service.ts   → Login, register, refresh (compartido entre llamadas), logout
+    │   ├── auth.store.ts     → Signal-based state (token, refreshToken, user)
+    │   ├── auth.guard.ts     → Exige sesión
+    │   ├── role.guard.ts     → Exige un rol de data.roles
+    │   └── auth.utils.ts     → Lógica pura (exp del JWT, roles...) con tests
     ├── http/
     │   ├── auth.interceptor.ts   → Añade Bearer token
-    │   └── error.interceptor.ts  → Maneja 401 → redirect login
+    │   └── error.interceptor.ts  → Ante un 401 renueva la sesión y reintenta; si falla, redirige a login
     ├── components/
     │   ├── login/            → Componente de login reutilizable
     │   └── register/         → Componente de registro
@@ -148,6 +150,8 @@ web-shared/src/
 
 El paquete se consume **directamente desde el fuente**: su `package.json` apunta `main` a `src/index.ts`, sin paso de compilación. Por eso los cambios en `web-shared` requieren reiniciar el dev server del frontend.
 
+La lógica pura de `web-shared` (`auth.utils.ts`) tiene tests con vitest: `npm test -w @resttek/web-shared`. Usa el binario de vitest de `packages/api`, porque instalarlo en este workspace choca con los peers de `@angular/build`.
+
 ### Exports de la Librería
 
 ```tsx
@@ -155,6 +159,8 @@ export * from './lib/tokens'
 export * from './lib/auth/auth.service'
 export * from './lib/auth/auth.store'
 export * from './lib/auth/auth.guard'
+export * from './lib/auth/role.guard'
+export * from './lib/auth/auth.utils'
 export * from './lib/http/auth.interceptor'
 export * from './lib/http/error.interceptor'
 export * from './lib/components/login/login.component'

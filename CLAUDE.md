@@ -23,6 +23,8 @@ npm test                    # vitest run, solo del paquete api
 - Test en modo watch: `cd packages/api && npm run test:watch`
 - Un solo test: `cd packages/api && npx vitest run src/services/order.service.test.ts` (o `-t "nombre del test"`).
 - Los frontends tienen `build` (`ng build`) pero no hay tests ni lint configurados en ellos; la raíz no define lint ni build global.
+- La API necesita `JWT_SECRET` (≥32 caracteres) en `packages/api/.env` (plantilla en `.env.example`); sin él no arranca. Los tests lo definen en `vitest.config.ts`.
+- Tests de `web-shared` (lógica pura): `npm test -w @resttek/web-shared`.
 - Credenciales de seed: la contraseña de cada usuario es su propio email (p. ej. `admin@resttek.com`). Lista completa en el README.
 - Los cambios en `web-shared` no se recargan solos: reinicia el dev server del frontend.
 
@@ -38,7 +40,7 @@ Documentación detallada en `docs/arquitectura/` y `docs/dominio/` (modelo de da
 - Alias de paths en `tsconfig.json` (`@services/*`, `@repositories/*`, `@employee/*`, `@shared/*`, etc.); vitest los resuelve con `vite-tsconfig-paths`. Usa los alias en vez de rutas relativas largas.
 - TS muy estricto (`noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax`), ESM (`"type": "module"`, `nodenext`).
 - BD: `packages/api/resttek.db`; las tablas se crean/migran en código al arrancar. Con `NODE_ENV=test` se usa SQLite `:memory:`. Los tests son unitarios colocados junto al código (`*.test.ts`).
-- Auth: JWT en `Authorization: Bearer`; roles comprobados con `authorize()`. Errores de dominio en `errors/` (`AppError`, `DomainErrors`) traducidos por `errorHandler`.
+- Auth: access JWT de 15 min en `Authorization: Bearer` + refresh token rotatorio con revocación (`/auth/refresh`, `/auth/logout`, tabla `refresh_tokens`); roles con `authorize()` y aislamiento por restaurante con `authorizeRestaurant`. Ver `docs/arquitectura/seguridad.md`. Errores de dominio en `errors/` (`AppError`, `DomainErrors`) traducidos por `errorHandler`.
 
 ### Frontends
 

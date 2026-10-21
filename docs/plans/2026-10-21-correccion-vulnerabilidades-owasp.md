@@ -170,8 +170,8 @@ Depende del Bloque 2 (secreto y `issuer`/`audience`). Se ejecuta antes de las ta
 
 **Cierre**
 
-- [ ] **T42** (~10 min): Repetir las pruebas de T1 y T2 y la matriz de la sección 7 — `packages/api`
-- [ ] **T43** (~5 min): Actualizar la documentación (sección 9) — `docs/`
+- [x] **T42** (~10 min): Repetir las pruebas de T1 y T2 y la matriz de la sección 7 — `packages/api`
+- [x] **T43** (~5 min): Actualizar la documentación (sección 9) — `docs/`
 
 ## 7. Verificación
 
@@ -222,7 +222,7 @@ Frontend: con un cocinero, navegar a `/barra` redirige; cambiar `auth_user` en `
 
 ## 9. Documentación a actualizar
 
-- `README.md`: variable `JWT_SECRET`, `CORS_ORIGINS`, advertencia sobre el seed y la política de contraseñas.
-- `docs/arquitectura/`: modelo de autorización (roles y aislamiento por restaurante), flujo de refresh y revocación, y cabeceras de seguridad/CSP.
-- `docs/dominio/`: nueva tabla `refresh_tokens` en el modelo de datos.
-- `CLAUDE.md`: nota sobre `JWT_SECRET` obligatorio.
+- [x] `README.md`: variable `JWT_SECRET`, `CORS_ORIGINS`, advertencia sobre el seed y la política de contraseñas.
+- [x] `docs/arquitectura/`: modelo de autorización (roles y aislamiento por restaurante), flujo de refresh y revocación, y cabeceras de seguridad/CSP.
+- [x] `docs/dominio/`: nueva tabla `refresh_tokens` en el modelo de datos.
+- [x] `CLAUDE.md`: nota sobre `JWT_SECRET` obligatorio.

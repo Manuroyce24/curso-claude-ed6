@@ -130,7 +130,7 @@ En ambos casos la capa HTTP (controladores y rutas) es un adaptador de entrada y
 
 ## Autenticación
 
-El sistema usa **JWT (JSON Web Tokens)** para autenticación:
+El sistema usa **JWT (JSON Web Tokens)** de vida corta más un **refresh token** con rotación y revocación:
 
 ```mermaid
 sequenceDiagram
@@ -141,15 +141,22 @@ sequenceDiagram
     U->>F: Login (email + password)
     F->>A: POST /api/v1/auth/login
     A->>A: Verificar bcrypt hash
-    A-->>F: { token, employee }
+    A-->>F: { token (15 min), refreshToken (7 días), employee }
     F->>F: Guardar en localStorage
-    F->>A: GET /api/v1/restaurants<br/>Authorization: Bearer <token>
-    A->>A: Verificar JWT + permisos
+    F->>A: GET /api/v1/orders/active<br/>Authorization: Bearer <token>
+    A->>A: Verificar JWT + rol + restaurante
     A-->>F: datos
+    Note over F,A: El access token caduca → 401
+    F->>A: POST /api/v1/auth/refresh { refreshToken }
+    A->>A: Rotar: revocar el usado, emitir uno nuevo
+    A-->>F: { token, refreshToken, employee }
+    F->>A: Reintenta la petición original
 ```
 
-- **Backend**: middleware `authenticate` verifica el JWT; `authorize` comprueba roles.
-- **Frontend**: `AuthInterceptor` añade el token a cada petición; `AuthGuard` protege rutas.
+- **Backend**: `authenticate` verifica el JWT (HS256, `issuer`, `audience`); `authorize` comprueba roles y `authorizeRestaurant` el restaurante. `JWT_SECRET` es obligatorio.
+- **Refresh**: la API guarda solo el hash del refresh token (tabla `refresh_tokens`). Reutilizar un token ya rotado revoca toda su familia; `POST /auth/logout` lo revoca.
+- **Frontend**: `AuthInterceptor` añade el token a cada petición; `ErrorInterceptor` renueva la sesión ante un 401 y reintenta; `AuthGuard` y `RoleGuard` protegen rutas (solo como UX: la barrera real es la API).
+- Más detalle en [Seguridad](./seguridad.md).
 
 ---
 
