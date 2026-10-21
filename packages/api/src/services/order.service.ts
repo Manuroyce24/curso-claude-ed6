@@ -2,7 +2,17 @@ import { randomUUID } from 'crypto'
 import type { Order, OrderItem } from '@models/order.model.js'
 import { normalizeOrderStatus } from '@models/order.model.js'
 import type { OrderRepository } from '@repositories/order.repository.js'
-import { RestaurantIdRequiredError, OrderNotFoundError } from '@errors/DomainErrors.js'
+import { RestaurantIdRequiredError, OrderNotFoundError, ForbiddenError } from '@errors/DomainErrors.js'
+
+export interface Actor {
+    id: string
+    role: string
+    restaurantId?: string | null
+}
+
+const esAdmin = (actor: Actor): boolean => actor.role === 'admin'
+const esPersonalDe = (actor: Actor, restaurantId: string): boolean =>
+    !!actor.restaurantId && actor.restaurantId === restaurantId
 
 export interface CreateOrderRequest {
     restaurantId: string
@@ -50,13 +60,24 @@ export class OrderService {
         return order
     }
 
-    async listActive(restaurantId: string): Promise<Order[]> {
+    async listActive(actor: Actor, requestedRestaurantId?: string): Promise<Order[]> {
+        let restaurantId: string
+        if (esAdmin(actor)) {
+            if (!requestedRestaurantId) throw new RestaurantIdRequiredError()
+            restaurantId = requestedRestaurantId
+        } else {
+            if (!actor.restaurantId) throw new ForbiddenError()
+            if (requestedRestaurantId && requestedRestaurantId !== actor.restaurantId) {
+                throw new ForbiddenError()
+            }
+            restaurantId = actor.restaurantId
+        }
         return this.orderRepository.findActiveByRestaurant(restaurantId)
     }
 
-    async getById(orderId: string): Promise<Order> {
+    async getById(orderId: string, actor: Actor): Promise<Order> {
         const order = await this.orderRepository.findById(orderId)
-        if (!order) {
+        if (!order || !this.puedeVer(order, actor)) {
             throw new OrderNotFoundError()
         }
         return order
@@ -66,9 +87,9 @@ export class OrderService {
         return this.orderRepository.findByClientId(clientId)
     }
 
-    async updateItemStatus(orderId: string, itemId: string, status: string): Promise<void> {
+    async updateItemStatus(orderId: string, itemId: string, status: string, actor: Actor): Promise<void> {
         const order = await this.orderRepository.findById(orderId)
-        if (!order) {
+        if (!order || !(esAdmin(actor) || esPersonalDe(actor, order.restaurantId))) {
             throw new OrderNotFoundError()
         }
 
@@ -81,5 +102,11 @@ export class OrderService {
         item.status = normalizedStatus
 
         await this.orderRepository.updateItemStatus(orderId, itemId, normalizedStatus)
+    }
+
+    private puedeVer(order: Order, actor: Actor): boolean {
+        return esAdmin(actor)
+            || esPersonalDe(actor, order.restaurantId)
+            || (!!order.clientId && order.clientId === actor.id)
     }
 }
