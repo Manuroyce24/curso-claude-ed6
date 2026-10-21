@@ -7,6 +7,7 @@ export default defineConfig({
     globals: true,
     env: {
       NODE_ENV: 'test',
+      AUTH_RATE_LIMIT_MAX: '1000',
       JWT_SECRET: 'secreto-de-pruebas-resttek-0123456789abcdef'
     }
   }
