@@ -132,7 +132,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 
 **Bloque 6 — Dependencias y repositorio (alta/baja)**
 
-- [ ] **T31** (~10 min): `npm audit fix` y actualización de vitest/vite; comprobar `npm test` — `package.json`, `package-lock.json`
+- [x] **T31** (~10 min): `npm audit fix` y actualización de vitest/vite; comprobar `npm test` — `package.json`, `package-lock.json`
 - [ ] **T32** (~5 min): Añadir `*.db`, `.env*` (excepto `.env.example`) y `.DS_Store` — `.gitignore`
 
 **Bloque 7 — Frontend (alta/media/baja)**
