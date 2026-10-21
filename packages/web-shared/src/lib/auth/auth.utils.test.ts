@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { puedeAcceder, decodeJwtExp, isTokenExpired, parseStoredUser, haySesion } from './auth.utils'
+import { puedeAcceder, decodeJwtExp, isTokenExpired, parseStoredUser, haySesion, debeRenovarSesion } from './auth.utils'
 
 const b64url = (obj: object) => Buffer.from(JSON.stringify(obj)).toString('base64url')
 const jwt = (payload: object) => `${b64url({ alg: 'HS256', typ: 'JWT' })}.${b64url(payload)}.firma`
@@ -85,4 +85,24 @@ describe('haySesion', () => {
   it('false con access caducado y sin refresh', () => {
     expect(haySesion(caducado, null, ahora)).toBe(false)
   })
+})
+
+describe('debeRenovarSesion', () => {
+  it('true ante un 401 en una ruta normal con refresh token', () => {
+    expect(debeRenovarSesion('/api/v1/orders/active', 401, true)).toBe(true)
+  })
+
+  it('false si no es 401', () => {
+    expect(debeRenovarSesion('/api/v1/orders/active', 403, true)).toBe(false)
+    expect(debeRenovarSesion('/api/v1/orders/active', 500, true)).toBe(false)
+  })
+
+  it('false sin refresh token', () => {
+    expect(debeRenovarSesion('/api/v1/orders/active', 401, false)).toBe(false)
+  })
+
+  it.each(['/api/v1/auth/login', '/api/v1/auth/refresh', '/api/v1/auth/logout', '/api/v1/auth/register'])(
+    'false en las propias rutas de autenticación (%s), para evitar bucles', (url) => {
+      expect(debeRenovarSesion(url, 401, true)).toBe(false)
+    })
 })

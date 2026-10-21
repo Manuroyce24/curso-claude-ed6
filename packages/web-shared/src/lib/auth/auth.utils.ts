@@ -56,3 +56,8 @@ export function haySesion(token: string | null, refreshToken: string | null, aho
   if (!token) return false
   return !isTokenExpired(token, ahoraMs, 0) || refreshToken !== null
 }
+
+/** Un 401 se intenta resolver renovando el token, salvo en las rutas /auth/* (evita bucles). */
+export function debeRenovarSesion(url: string, status: number, tieneRefreshToken: boolean): boolean {
+  return status === 401 && tieneRefreshToken && !/\/auth\//.test(url)
+}
