@@ -163,7 +163,23 @@ export class Database {
                 status TEXT NOT NULL,
                 FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE,
                 FOREIGN KEY(dish_id) REFERENCES dishes(id)
-            )
+            );
+
+            CREATE TABLE IF NOT EXISTS refresh_tokens (
+                id TEXT PRIMARY KEY,
+                employee_id TEXT NOT NULL,
+                family_id TEXT NOT NULL,
+                token_hash TEXT NOT NULL UNIQUE,
+                expires_at TEXT NOT NULL,
+                revoked_at TEXT,
+                replaced_by TEXT,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY(employee_id) REFERENCES employees(id) ON DELETE CASCADE
+            );
+
+            CREATE INDEX IF NOT EXISTS idx_refresh_tokens_hash ON refresh_tokens(token_hash);
+
+            CREATE INDEX IF NOT EXISTS idx_refresh_tokens_employee ON refresh_tokens(employee_id)
         `.split(';')
 
         for (const q of queries) {
