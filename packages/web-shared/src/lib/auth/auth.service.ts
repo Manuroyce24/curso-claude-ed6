@@ -7,6 +7,7 @@ import { AuthStore } from './auth.store'
 
 interface LoginResponse {
   token: string
+  refreshToken: string
   employee: {
     id: string
     firstName: string
@@ -29,7 +30,7 @@ export class AuthService {
     const response = await firstValueFrom(
       this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, { email, password })
     )
-    this.store.setSession(response.token, response.employee)
+    this.store.setSession(response.token, response.employee, response.refreshToken)
   }
 
   async register(firstName: string, lastName: string, email: string, password: string): Promise<void> {
@@ -41,10 +42,38 @@ export class AuthService {
         password
       })
     )
-    this.store.setSession(response.token, response.employee)
+    this.store.setSession(response.token, response.employee, response.refreshToken)
+  }
+
+  private refreshEnCurso: Promise<void> | null = null
+
+  /**
+   * Renueva el par de tokens con el refresh token guardado. Las llamadas simultáneas
+   * comparten una sola petición: el refresh rota y una segunda petición lo invalidaría.
+   */
+  refresh(): Promise<void> {
+    if (this.refreshEnCurso) return this.refreshEnCurso
+
+    const refreshToken = this.store.refreshToken()
+    if (!refreshToken) return Promise.reject(new Error('No hay refresh token'))
+
+    this.refreshEnCurso = firstValueFrom(
+      this.http.post<LoginResponse>(`${this.apiUrl}/auth/refresh`, { refreshToken })
+    )
+      .then(response => this.store.setSession(response.token, response.employee, response.refreshToken))
+      .finally(() => { this.refreshEnCurso = null })
+
+    return this.refreshEnCurso
   }
 
   logout(): void {
+    const refreshToken = this.store.refreshToken()
+    const token = this.store.token()
+    // Revoca el refresh en el servidor (mejor esfuerzo). El header se fija a mano porque la sesión se limpia justo después.
+    if (refreshToken && token) {
+      this.http.post(`${this.apiUrl}/auth/logout`, { refreshToken }, { headers: { Authorization: `Bearer ${token}` } })
+        .subscribe({ error: () => undefined })
+    }
     this.store.clearSession()
     this.router.navigate(['/login'])
   }

@@ -164,7 +164,7 @@ Depende del Bloque 2 (secreto y `issuer`/`audience`). Se ejecuta antes de las ta
 - [x] **T53** (~10 min): Controlador y rutas `POST /auth/refresh` y `POST /auth/logout`, con rate limit propio — `auth.routes.ts`, controlador de auth
 - [x] **T54** (~5 min): Registrar los casos de uso y el repositorio — `contexts/employee/infrastructure/dependencies.ts`
 - [x] **T55** (~10 min): Tests unitarios de rotación, reutilización, caducidad y revocación — `RefreshTokenUseCase.test.ts`
-- [ ] **T56** (~10 min): En `web-shared`, guardar `refreshToken` y añadir `AuthService.refresh()` y `logout()` que llama a la API antes de limpiar el estado — `auth.service.ts`, `auth.store.ts`
+- [x] **T56** (~10 min): En `web-shared`, guardar `refreshToken` y añadir `AuthService.refresh()` y `logout()` que llama a la API antes de limpiar el estado — `auth.service.ts`, `auth.store.ts`
 - [ ] **T57** (~10 min): En el interceptor, ante un 401 llamar a `refresh()` una sola vez a la vez (cola de peticiones), reintentar la petición y, si falla, cerrar sesión — `web-shared/.../error.interceptor.ts`
 - [ ] **T58** (~5 min): No intentar refrescar en las propias llamadas de `/auth/*` para evitar bucles — interceptor
 

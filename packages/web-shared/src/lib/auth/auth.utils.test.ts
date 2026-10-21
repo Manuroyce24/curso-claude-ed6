@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { puedeAcceder, decodeJwtExp, isTokenExpired, parseStoredUser } from './auth.utils'
+import { puedeAcceder, decodeJwtExp, isTokenExpired, parseStoredUser, haySesion } from './auth.utils'
 
 const b64url = (obj: object) => Buffer.from(JSON.stringify(obj)).toString('base64url')
 const jwt = (payload: object) => `${b64url({ alg: 'HS256', typ: 'JWT' })}.${b64url(payload)}.firma`
@@ -62,5 +62,27 @@ describe('parseStoredUser', () => {
 
   it.each([null, '', '{no es json', 'null', '"texto"', '42', '[]'])('devuelve null para %s sin lanzar', (raw) => {
     expect(parseStoredUser(raw)).toBeNull()
+  })
+})
+
+describe('haySesion', () => {
+  const ahora = 1_800_000_000_000
+  const vigente = jwt({ exp: ahora / 1000 + 600 })
+  const caducado = jwt({ exp: ahora / 1000 - 600 })
+
+  it('false sin access token', () => {
+    expect(haySesion(null, 'refresh', ahora)).toBe(false)
+  })
+
+  it('true con access vigente', () => {
+    expect(haySesion(vigente, null, ahora)).toBe(true)
+  })
+
+  it('true con access caducado pero refresh disponible (se puede renovar)', () => {
+    expect(haySesion(caducado, 'refresh', ahora)).toBe(true)
+  })
+
+  it('false con access caducado y sin refresh', () => {
+    expect(haySesion(caducado, null, ahora)).toBe(false)
   })
 })

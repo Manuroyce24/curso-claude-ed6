@@ -50,3 +50,9 @@ export function parseStoredUser(raw: string | null): UsuarioGuardado | null {
   }
   return null
 }
+
+/** Hay sesión si el access token vale o, al menos, se puede renovar con el refresh token. */
+export function haySesion(token: string | null, refreshToken: string | null, ahoraMs: number = Date.now()): boolean {
+  if (!token) return false
+  return !isTokenExpired(token, ahoraMs, 0) || refreshToken !== null
+}
