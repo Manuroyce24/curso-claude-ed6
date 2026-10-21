@@ -48,3 +48,14 @@ export const authorize = (roles: string[]) => {
         next()
     }
 }
+
+export const authorizeRestaurant = (req: AuthRequest, res: Response, next: NextFunction): void => {
+    const user = req.user
+    const restaurantId = req.params.restaurantId
+    const permitido = !!user && (user.role === 'admin' || (!!user.restaurantId && user.restaurantId === restaurantId))
+    if (!permitido) {
+        res.status(403).json({ error: 'Forbidden: Insufficient permissions' })
+        return
+    }
+    next()
+}
