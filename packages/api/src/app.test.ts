@@ -22,3 +22,15 @@ describe('CORS', () => {
         expect(res.headers['access-control-allow-origin']).toBeUndefined()
     })
 })
+
+describe('límite de body', () => {
+    it('rechaza cuerpos JSON de más de 100kb con 413', async () => {
+        const res = await request(app).post('/api/v1/auth/login').send({ email: 'x'.repeat(200_000) })
+        expect(res.status).toBe(413)
+    })
+
+    it('responde 400 a un JSON malformado', async () => {
+        const res = await request(app).post('/api/v1/auth/login').set('Content-Type', 'application/json').send('{no es json')
+        expect(res.status).toBe(400)
+    })
+})
