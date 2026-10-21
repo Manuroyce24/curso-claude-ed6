@@ -64,4 +64,22 @@ describe('aislamiento por restaurante en platos e ingredientes', () => {
             expect(res.status).toBe(404)
         })
     })
+
+    describe('restaurantes', () => {
+        it('un cliente no puede leer los datos de un restaurante autenticado', async () => {
+            const res = await request(app).get('/api/v1/restaurants/rest-a')
+                .set(...bearer({ id: 'cli-1', role: 'cliente', restaurantId: null }))
+            expect(res.status).toBe(403)
+        })
+
+        it('un manager no lee otro restaurante', async () => {
+            const res = await request(app).get('/api/v1/restaurants/rest-b').set(...bearer(managerA))
+            expect(res.status).toBe(403)
+        })
+
+        it('un manager lee el suyo y el admin cualquiera', async () => {
+            expect((await request(app).get('/api/v1/restaurants/rest-a').set(...bearer(managerA))).status).toBe(200)
+            expect((await request(app).get('/api/v1/restaurants/rest-b').set(...bearer(admin))).status).toBe(200)
+        })
+    })
 })
