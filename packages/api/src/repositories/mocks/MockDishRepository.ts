@@ -8,6 +8,10 @@ export class MockDishRepository implements DishRepository {
         return this.dishes.find(d => d.id === id) || null
     }
 
+    async findByIdInRestaurant(id: string, restaurantId: string): Promise<Dish | null> {
+        return this.dishes.find(d => d.id === id && d.restaurantId === restaurantId) || null
+    }
+
     async findByRestaurantId(restaurantId: string): Promise<Dish[]> {
         return this.dishes.filter(d => d.restaurantId === restaurantId)
     }

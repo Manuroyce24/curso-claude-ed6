@@ -21,6 +21,7 @@ interface DishIngredientRow {
 
 export interface DishRepository {
     findById(id: string): Promise<Dish | null>
+    findByIdInRestaurant(id: string, restaurantId: string): Promise<Dish | null>
     findByRestaurantId(restaurantId: string): Promise<Dish[]>
     save(dish: Dish): Promise<void>
     delete(id: string): Promise<void>
@@ -33,6 +34,16 @@ export class SqliteDishRepository implements DishRepository {
         const row = await this.db.get<DishRow>(
             'SELECT id, name, description, price, category, available, restaurant_id as restaurantId, created_at as createdAt, updated_at as updatedAt FROM dishes WHERE id = ?',
             [id]
+        )
+        if (!row) return null
+        const ingredients = await this.findIngredientsByDishId(id)
+        return this.mapToDish(row, ingredients)
+    }
+
+    async findByIdInRestaurant(id: string, restaurantId: string): Promise<Dish | null> {
+        const row = await this.db.get<DishRow>(
+            'SELECT id, name, description, price, category, available, restaurant_id as restaurantId, created_at as createdAt, updated_at as updatedAt FROM dishes WHERE id = ? AND restaurant_id = ?',
+            [id, restaurantId]
         )
         if (!row) return null
         const ingredients = await this.findIngredientsByDishId(id)
