@@ -84,7 +84,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 
 **Bloque 0 — Reproducción (antes de corregir)**
 
-- [ ] **T1** (~10 min): Arrancar la API con el seed y reproducir con `curl` la lectura de un pedido ajeno y el cambio de estado desde un token `cliente` — `packages/api`
+- [x] **T1** (~10 min): Arrancar la API con el seed y reproducir con `curl` la lectura de un pedido ajeno y el cambio de estado desde un token `cliente` — `packages/api`
 - [ ] **T2** (~5 min): Reproducir con `curl` el acceso a `PUT /restaurants/A/dishes/<id de B>` con un manager de A — `packages/api`
 - [x] **T3** (~5 min): Ejecutar `npm audit --omit=dev` y guardar el resultado como línea base — raíz
 
@@ -94,8 +94,8 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 - [x] **T5** (~10 min): Añadir `restaurantId` al contexto de `getById`, `listActive` y `updateItemStatus` y lanzar `OrderNotFoundError` si el pedido no pertenece al usuario o a su restaurante — `order.service.ts`
 - [x] **T6** (~5 min): Añadir un error de dominio `ForbiddenError` y su traducción en `errorHandler` — `errors/DomainErrors.ts`, `errorHandler.ts`
 - [x] **T7** (~10 min): En `createOrder`, validar `items` y `quantity` (entero 1–50) y que cada `dishId` exista y sea del restaurante — `order.service.ts`
-- [ ] **T8** (~10 min): Pasar `req.user` a los métodos del servicio, derivar `restaurantId` del JWT y sustituir `error.message` por mensajes mapeados — `order.controller.ts`
-- [ ] **T9** (~5 min): Añadir `authorize` con los roles correspondientes a cada ruta — `order.routes.ts`
+- [x] **T8** (~10 min): Pasar `req.user` a los métodos del servicio, derivar `restaurantId` del JWT y sustituir `error.message` por mensajes mapeados — `order.controller.ts`
+- [x] **T9** (~5 min): Añadir `authorize` con los roles correspondientes a cada ruta — `order.routes.ts`
 
 **Bloque 2 — Secreto JWT (crítica)**
 

@@ -4,6 +4,10 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   plugins: [tsconfigPaths()],
   test: {
-    globals: true
+    globals: true,
+    env: {
+      NODE_ENV: 'test',
+      JWT_SECRET: 'secreto-de-pruebas-resttek-0123456789abcdef'
+    }
   }
 })
