@@ -13,5 +13,8 @@
   },
   "devDependencies": {
     "typescript": "~5.9.2"
+  },
+  "scripts": {
+    "test": "../api/node_modules/.bin/vitest run"
   }
 }

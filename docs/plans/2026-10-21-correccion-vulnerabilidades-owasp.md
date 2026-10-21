@@ -137,7 +137,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 
 **Bloque 7 — Frontend (alta/media/baja)**
 
-- [ ] **T33** (~10 min): Crear `roleGuard` leyendo `route.data['roles']` y exportarlo — `web-shared/src/lib/auth/`, `web-shared/src/index.ts`
+- [x] **T33** (~10 min): Crear `roleGuard` leyendo `route.data['roles']` y exportarlo — `web-shared/src/lib/auth/`, `web-shared/src/index.ts`
 - [ ] **T34** (~5 min): Aplicar `roleGuard` con `data.roles` a `cocina`, `barra` y `salon` — `web-empleados/src/app/app.routes.ts`
 - [ ] **T35** (~10 min): Comprobar `exp` del JWT en `isAuthenticated` y envolver `JSON.parse` en `try/catch` — `web-shared/.../auth.store.ts`
 - [ ] **T36** (~10 min): Parar el polling en `ngOnDestroy`, evitar doble `startPolling` y pararlo al cerrar sesión o tras un 401 — `order.store.ts`, páginas de `orders/pages`
