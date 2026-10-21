@@ -1,4 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core'
+import { isTokenExpired, parseStoredUser } from './auth.utils'
 
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
@@ -6,12 +7,16 @@ export class AuthStore {
     typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null
   )
   private readonly _user = signal<any>(
-    typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('auth_user') || 'null') : null
+    typeof localStorage !== 'undefined' ? parseStoredUser(localStorage.getItem('auth_user')) : null
   )
 
   readonly token = this._token.asReadonly()
   readonly user = this._user.asReadonly()
-  readonly isAuthenticated = computed(() => this._token() !== null)
+  // Un token caducado o ilegible no cuenta como sesión: evita pintar la app y esperar al primer 401.
+  readonly isAuthenticated = computed(() => {
+    const token = this._token()
+    return token !== null && !isTokenExpired(token, Date.now(), 0)
+  })
   readonly userRole = computed(() => this._user()?.role ?? null)
 
   setSession(token: string, user: any): void {
