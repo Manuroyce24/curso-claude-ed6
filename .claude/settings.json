@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Glob|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '[.tool_input[]? | strings] | join(\" \")' | grep -qiE 'constants\\.js' && { echo 'Acceso bloqueado: src/CONSTANTS.js no se puede leer.' >&2; exit 2; } || exit 0",
+            "statusMessage": "Comprobando acceso a CONSTANTS.js..."
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  }
+}
