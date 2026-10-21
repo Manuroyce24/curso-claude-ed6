@@ -2,7 +2,7 @@
 
 - **Tipo**: bugfix
 - **Fecha**: 2026-10-21
-- **Estado**: pendiente
+- **Estado**: completado
 
 ## 1. Resumen
 
