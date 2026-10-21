@@ -3,6 +3,10 @@ import type { IEmployeeRepository } from '@employee/domain/IEmployeeRepository.j
 import type { IAuthService } from '@employee/domain/IAuthService.js'
 import { InvalidCredentialsError } from '@errors/DomainErrors.js'
 
+// Hash bcrypt (cost 10) de una contraseña aleatoria. Se compara cuando el email no existe
+// para que el tiempo de respuesta no revele qué cuentas están registradas.
+const HASH_FICTICIO = '$2b$10$PvjYZRr38OuOOyYCNNvmnemN5dgCLXoN9bJb.mrgbwAhTHdSiqP0O'
+
 export interface LoginDTO {
     email: string
     passwordRaw: string
@@ -29,12 +33,11 @@ export class LoginUseCase {
     async execute(dto: LoginDTO): Promise<LoginResponse> {
         const employee = await this.employeeRepository.findByEmail(Email.normalize(dto.email))
 
-        if (!employee) {
-            throw new InvalidCredentialsError()
-        }
-
-        const isValid = await this.authService.comparePasswords(dto.passwordRaw, employee.passwordHash)
-        if (!isValid) {
+        const isValid = await this.authService.comparePasswords(
+            dto.passwordRaw,
+            employee?.passwordHash ?? HASH_FICTICIO
+        )
+        if (!employee || !isValid) {
             throw new InvalidCredentialsError()
         }
 

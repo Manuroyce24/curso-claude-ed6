@@ -2,7 +2,8 @@ import { MockEmployeeRepository, MockAuthService } from '@employee/application/m
 import { CreateEmployeeUseCase } from '@employee/application/CreateEmployeeUseCase.js'
 import { LoginUseCase } from '@employee/application/LoginUseCase.js'
 import { Employee } from '@employee/domain/Employee.js'
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { InvalidCredentialsError } from '@errors/DomainErrors.js'
 
 describe('Employee Application Use Cases', () => {
     let employeeRepo: MockEmployeeRepository
@@ -101,6 +102,15 @@ describe('Employee Application Use Cases', () => {
                 email: 'nobody@resttek.com',
                 passwordRaw: 'password123'
             })).rejects.toThrow('Invalid credentials')
+        })
+
+        it('should still compare passwords when the email does not exist (timing)', async () => {
+            const spy = vi.spyOn(authService, 'comparePasswords')
+
+            await expect(loginUseCase.execute({ email: 'nadie@resttek.com', passwordRaw: 'password123' }))
+                .rejects.toThrow(InvalidCredentialsError)
+
+            expect(spy).toHaveBeenCalledOnce()
         })
 
         it('should find the employee ignoring email case', async () => {
