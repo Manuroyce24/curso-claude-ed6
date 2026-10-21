@@ -154,7 +154,7 @@ Depende del Bloque 2 (secreto y `issuer`/`audience`). Se ejecuta antes de las ta
 
 - [x] **T44** (~10 min): Crear la tabla `refresh_tokens` (`id`, `employee_id`, `family_id`, `token_hash`, `expires_at`, `revoked_at`, `replaced_by`, `created_at`) con índice en `token_hash` — `config/database.ts`
 - [x] **T45** (~10 min): Puerto `RefreshTokenRepository` (`save`, `findByHash`, `revoke`, `revokeFamily`, `revokeAllByEmployee`) — `contexts/employee/domain/`
-- [ ] **T46** (~10 min): Implementación SQLite con consultas parametrizadas — `contexts/employee/infrastructure/SqliteRefreshTokenRepository.ts`
+- [x] **T46** (~10 min): Implementación SQLite con consultas parametrizadas — `contexts/employee/infrastructure/SqliteRefreshTokenRepository.ts`
 - [ ] **T47** (~5 min): Generar el refresh con `crypto.randomBytes(32)` y guardar solo su hash SHA-256 — `BcryptAuthService.ts`
 - [ ] **T48** (~5 min): Reducir la expiración del access JWT a 15 min (configurable) — `BcryptAuthService.ts`
 - [ ] **T49** (~10 min): `LoginUseCase` crea la familia y devuelve `refreshToken` junto al access — `LoginUseCase.ts`
