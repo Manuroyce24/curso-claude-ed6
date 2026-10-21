@@ -1,6 +1,7 @@
 import { Email } from '@shared/domain/value-objects/Email.js'
 import type { IEmployeeRepository } from '@employee/domain/IEmployeeRepository.js'
 import type { IAuthService } from '@employee/domain/IAuthService.js'
+import type { TokenIssuer } from '@employee/application/TokenIssuer.js'
 import { InvalidCredentialsError } from '@errors/DomainErrors.js'
 
 // Hash bcrypt (cost 10) de una contraseña aleatoria. Se compara cuando el email no existe
@@ -14,6 +15,7 @@ export interface LoginDTO {
 
 export interface LoginResponse {
     token: string
+    refreshToken: string
     employee: {
         id: string
         firstName: string
@@ -27,7 +29,8 @@ export interface LoginResponse {
 export class LoginUseCase {
     constructor(
         private employeeRepository: IEmployeeRepository,
-        private authService: IAuthService
+        private authService: IAuthService,
+        private tokenIssuer: TokenIssuer
     ) {}
 
     async execute(dto: LoginDTO): Promise<LoginResponse> {
@@ -43,7 +46,7 @@ export class LoginUseCase {
             throw new InvalidCredentialsError()
         }
 
-        const token = this.authService.generateToken({
+        const { token, refreshToken } = await this.tokenIssuer.issue({
             id: employee.id,
             role: employee.role,
             restaurantId: employee.restaurantId
@@ -51,6 +54,7 @@ export class LoginUseCase {
 
         return {
             token,
+            refreshToken,
             employee: {
                 id: employee.id,
                 firstName: employee.firstName,

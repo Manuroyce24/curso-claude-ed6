@@ -1,6 +1,7 @@
-import { MockEmployeeRepository, MockAuthService } from '@employee/application/mocks/MockDependencies.js'
+import { MockEmployeeRepository, MockAuthService, MockRefreshTokenRepository } from '@employee/application/mocks/MockDependencies.js'
 import { CreateEmployeeUseCase } from '@employee/application/CreateEmployeeUseCase.js'
 import { LoginUseCase } from '@employee/application/LoginUseCase.js'
+import { TokenIssuer } from '@employee/application/TokenIssuer.js'
 import { Employee } from '@employee/domain/Employee.js'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { InvalidCredentialsError } from '@errors/DomainErrors.js'
@@ -10,12 +11,14 @@ describe('Employee Application Use Cases', () => {
     let authService: MockAuthService
     let createEmployeeUseCase: CreateEmployeeUseCase
     let loginUseCase: LoginUseCase
+    let refreshRepo: MockRefreshTokenRepository
 
     beforeEach(() => {
         employeeRepo = new MockEmployeeRepository()
         authService = new MockAuthService()
         createEmployeeUseCase = new CreateEmployeeUseCase(employeeRepo, authService)
-        loginUseCase = new LoginUseCase(employeeRepo, authService)
+        refreshRepo = new MockRefreshTokenRepository()
+        loginUseCase = new LoginUseCase(employeeRepo, authService, new TokenIssuer(authService, refreshRepo))
     })
 
     describe('CreateEmployeeUseCase', () => {
@@ -120,6 +123,47 @@ describe('Employee Application Use Cases', () => {
                 .rejects.toThrow(InvalidCredentialsError)
 
             expect(spy).toHaveBeenCalledWith('', expect.any(String))
+        })
+
+        it('should issue a refresh token and store only its hash', async () => {
+            await employeeRepo.save(Employee.create({
+                id: 'e-refresh',
+                firstName: 'Re',
+                lastName: 'Fresh',
+                email: 'refresh@resttek.com',
+                passwordHash: 'hashed_password123',
+                role: 'manager',
+                restaurantId: 'r1'
+            }))
+
+            const result = await loginUseCase.execute({ email: 'refresh@resttek.com', passwordRaw: 'password123' })
+
+            expect(result.refreshToken).toBe('refresh-token-1')
+            expect(refreshRepo.records).toHaveLength(1)
+            expect(refreshRepo.records[0]).toMatchObject({
+                employeeId: 'e-refresh',
+                tokenHash: 'hash(refresh-token-1)',
+                revokedAt: null
+            })
+            expect(JSON.stringify(refreshRepo.records)).not.toContain('"refresh-token-1"')
+            expect(refreshRepo.records[0]!.expiresAt.getTime()).toBeGreaterThan(Date.now())
+        })
+
+        it('should start a new family on every login', async () => {
+            await employeeRepo.save(Employee.create({
+                id: 'e-fam',
+                firstName: 'Fa',
+                lastName: 'Mily',
+                email: 'fam@resttek.com',
+                passwordHash: 'hashed_password123',
+                role: 'manager',
+                restaurantId: 'r1'
+            }))
+
+            await loginUseCase.execute({ email: 'fam@resttek.com', passwordRaw: 'password123' })
+            await loginUseCase.execute({ email: 'fam@resttek.com', passwordRaw: 'password123' })
+
+            expect(refreshRepo.records[0]!.familyId).not.toBe(refreshRepo.records[1]!.familyId)
         })
 
         it('should find the employee ignoring email case', async () => {

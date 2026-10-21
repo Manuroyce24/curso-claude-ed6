@@ -1,6 +1,7 @@
 import type { IEmployeeRepository } from '@employee/domain/IEmployeeRepository.js'
 import type { IAuthService } from '@employee/domain/IAuthService.js'
 import type { Employee } from '@employee/domain/Employee.js'
+import type { IRefreshTokenRepository, RefreshTokenRecord } from '@employee/domain/IRefreshTokenRepository.js'
 
 export class MockEmployeeRepository implements IEmployeeRepository {
     private employees: Map<string, Employee> = new Map()
@@ -61,5 +62,33 @@ export class MockAuthService implements IAuthService {
 
     hashRefreshToken(token: string): string {
         return `hash(${token})`
+    }
+}
+
+export class MockRefreshTokenRepository implements IRefreshTokenRepository {
+    records: RefreshTokenRecord[] = []
+
+    async save(record: RefreshTokenRecord): Promise<void> {
+        this.records.push({ ...record })
+    }
+
+    async findByHash(tokenHash: string): Promise<RefreshTokenRecord | null> {
+        return this.records.find(r => r.tokenHash === tokenHash) ?? null
+    }
+
+    async revoke(id: string, replacedBy: string | null = null): Promise<void> {
+        const r = this.records.find(x => x.id === id)
+        if (r && !r.revokedAt) {
+            r.revokedAt = new Date()
+            r.replacedBy = replacedBy
+        }
+    }
+
+    async revokeFamily(familyId: string): Promise<void> {
+        this.records.filter(r => r.familyId === familyId && !r.revokedAt).forEach(r => { r.revokedAt = new Date() })
+    }
+
+    async revokeAllByEmployee(employeeId: string): Promise<void> {
+        this.records.filter(r => r.employeeId === employeeId && !r.revokedAt).forEach(r => { r.revokedAt = new Date() })
     }
 }
