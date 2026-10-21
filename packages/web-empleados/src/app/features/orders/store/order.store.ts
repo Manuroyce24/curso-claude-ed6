@@ -2,10 +2,12 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { Order, OrderStatus } from '../models/order.model';
 import { OrderService } from '../services/order.service';
 import { firstValueFrom } from 'rxjs';
+import { AuthStore } from '@resttek/web-shared';
 
 @Injectable({ providedIn: 'root' })
 export class OrderStore {
   private readonly orderService = inject(OrderService);
+  private readonly authStore = inject(AuthStore);
 
   private readonly _orders = signal<Order[]>([]);
   private readonly _loading = signal(false);
@@ -18,6 +20,10 @@ export class OrderStore {
   readonly error = this._error.asReadonly();
 
   async loadOrders(restaurantId: string): Promise<void> {
+    if (!this.authStore.isAuthenticated()) {
+      this.stopPolling();
+      return;
+    }
     this._loading.set(true);
     this._error.set(null);
     try {
@@ -52,6 +58,8 @@ export class OrderStore {
   }
 
   startPolling(restaurantId: string): void {
+    // Evita intervalos duplicados si se llama dos veces sin parar el anterior.
+    this.stopPolling();
     this.loadOrders(restaurantId);
     this.pollingInterval = setInterval(() => {
       this.loadOrders(restaurantId);
