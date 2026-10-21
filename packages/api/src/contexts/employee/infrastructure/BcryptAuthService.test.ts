@@ -12,6 +12,12 @@ describe('BcryptAuthService.generateToken', () => {
         expect(decoded.id).toBe('u1')
     })
 
+    it('el access token caduca a los 15 minutos', () => {
+        const token = service.generateToken({ id: 'u1', role: 'admin' })
+        const { iat, exp } = jwt.decode(token) as jwt.JwtPayload
+        expect(exp! - iat!).toBe(15 * 60)
+    })
+
     it('genera refresh tokens opacos, distintos y largos', () => {
         const a = service.generateRefreshToken()
         const b = service.generateRefreshToken()

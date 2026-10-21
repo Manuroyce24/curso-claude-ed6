@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'crypto'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET, JWT_ISSUER, JWT_AUDIENCE } from '@config/env.js'
+import { JWT_SECRET, JWT_ISSUER, JWT_AUDIENCE, ACCESS_TOKEN_TTL_SECONDS } from '@config/env.js'
 import type { IAuthService } from '@employee/domain/IAuthService.js'
 
 const SALT_ROUNDS = 10
@@ -17,7 +17,7 @@ export class BcryptAuthService implements IAuthService {
 
     generateToken(payload: any): string {
         return jwt.sign(payload, JWT_SECRET, {
-            expiresIn: '8h',
+            expiresIn: ACCESS_TOKEN_TTL_SECONDS,
             algorithm: 'HS256',
             issuer: JWT_ISSUER,
             audience: JWT_AUDIENCE

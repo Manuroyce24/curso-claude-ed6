@@ -17,3 +17,11 @@ export const JWT_SECRET: string = leerJwtSecret(process.env)
 
 export const JWT_ISSUER = 'resttek-api'
 export const JWT_AUDIENCE = 'resttek-app'
+
+const enteroPositivo = (valor: string | undefined, porDefecto: number): number => {
+    const numero = Number(valor)
+    return Number.isInteger(numero) && numero > 0 ? numero : porDefecto
+}
+
+export const ACCESS_TOKEN_TTL_SECONDS = enteroPositivo(process.env.ACCESS_TOKEN_TTL_SECONDS, 15 * 60)
+export const REFRESH_TOKEN_TTL_SECONDS = enteroPositivo(process.env.REFRESH_TOKEN_TTL_SECONDS, 7 * 24 * 60 * 60)
