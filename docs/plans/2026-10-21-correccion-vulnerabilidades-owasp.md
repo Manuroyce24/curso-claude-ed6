@@ -123,7 +123,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. Se marcan los bloques por priorid
 
 **Bloque 5 — Validación y configuración HTTP (media)**
 
-- [ ] **T25** (~5 min): Instalar `helmet` y añadirlo; `app.disable('x-powered-by')` — `app.ts`
+- [x] **T25** (~5 min): Instalar `helmet` y añadirlo; `app.disable('x-powered-by')` — `app.ts`
 - [ ] **T26** (~5 min): CORS con lista blanca (`CORS_ORIGINS`) y `express.json({ limit: '100kb' })` — `app.ts`
 - [ ] **T27** (~5 min): Limitar `limit` a 100 en el listado de empleados — `EmployeeController.ts`
 - [ ] **T28** (~5 min): Validar `price` (número finito > 0) — `dish.service.ts`

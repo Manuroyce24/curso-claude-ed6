@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import helmet from 'helmet'
 import authRoutes from '@employee/infrastructure/http/auth.routes.js'
 import employeeRoutes from '@employee/infrastructure/http/employee.routes.js'
 import restaurantEmployeeRoutes from '@employee/infrastructure/http/restaurant-employee.routes.js'
@@ -13,6 +14,8 @@ import { errorHandler } from '@shared/infrastructure/http/errorHandler.js'
 
 const app = express()
 
+app.disable('x-powered-by')
+app.use(helmet())
 app.use(cors())
 app.use(express.json())
 
