@@ -5,6 +5,8 @@ import { SqliteEmployeeRepository } from '@employee/infrastructure/SqliteEmploye
 import { BcryptAuthService } from '@employee/infrastructure/BcryptAuthService.js'
 import { SqliteRefreshTokenRepository } from '@employee/infrastructure/SqliteRefreshTokenRepository.js'
 import { TokenIssuer } from '@employee/application/TokenIssuer.js'
+import { RefreshTokenUseCase } from '@employee/application/RefreshTokenUseCase.js'
+import { LogoutUseCase } from '@employee/application/LogoutUseCase.js'
 import { LoginUseCase } from '@employee/application/LoginUseCase.js'
 import { CreateEmployeeUseCase } from '@employee/application/CreateEmployeeUseCase.js'
 import { RegisterClientUseCase } from '@employee/application/RegisterClientUseCase.js'
@@ -17,7 +19,10 @@ const loginUseCase = new LoginUseCase(employeeRepository, authService, tokenIssu
 const createEmployeeUseCase = new CreateEmployeeUseCase(employeeRepository, authService)
 const registerClientUseCase = new RegisterClientUseCase(employeeRepository, authService, tokenIssuer)
 
-export const authController = new AuthController(loginUseCase, registerClientUseCase)
+const refreshTokenUseCase = new RefreshTokenUseCase(employeeRepository, authService, refreshTokenRepository, tokenIssuer)
+const logoutUseCase = new LogoutUseCase(authService, refreshTokenRepository)
+
+export const authController = new AuthController(loginUseCase, registerClientUseCase, refreshTokenUseCase, logoutUseCase)
 export const employeeController = new EmployeeController(
     createEmployeeUseCase,
     employeeRepository
