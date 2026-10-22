@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import request from 'supertest'
 import app from '../app.js'
 import { dbConfig } from '@config/database.js'
-import { bearer, crearRestaurante, crearMesa } from '../test/http.js'
+import { bearer, crearRestaurante, crearMesa, crearPlato } from '../test/http.js'
 
 const managerA = { id: 'man-a', role: 'manager', restaurantId: 'rest-a' }
 const managerB = { id: 'man-b', role: 'manager', restaurantId: 'rest-b' }
@@ -160,6 +160,42 @@ describe('rutas /restaurants/:restaurantId/tables', () => {
 
         it('POST /occupy devuelve 404 para una mesa de otro restaurante', async () => {
             expect((await request(app).post(`${URL_C}/mesa-b1/occupy`).set(...bearer(cliente))).status).toBe(404)
+        })
+    })
+
+    describe('recorrido completo', () => {
+        const URL_D = '/api/v1/restaurants/rest-d/tables'
+        const camareroD = { id: 'cam-d', role: 'camarero', restaurantId: 'rest-d' }
+        const disponibles = async () => (await request(app).get(`${URL_D}/available?people=2`).set(...bearer(cliente)))
+            .body.map((m: { id: string }) => m.id)
+
+        beforeAll(async () => {
+            await crearRestaurante('rest-d')
+            await crearPlato('dish-d', 'rest-d')
+            await crearMesa('mesa-d1', 'rest-d', 1, 2)
+        })
+
+        it('el cliente ocupa la mesa y pide, el camarero ve el pedido y libera la mesa', async () => {
+            expect(await disponibles()).toEqual(['mesa-d1'])
+
+            expect((await request(app).post(`${URL_D}/mesa-d1/occupy`).set(...bearer(cliente))).status).toBe(200)
+            expect(await disponibles()).toEqual([])
+
+            const pedido = await request(app).post('/api/v1/orders').set(...bearer(cliente))
+                .send({ restaurantId: 'rest-d', tableId: 'mesa-d1', items: [{ dishId: 'dish-d', quantity: 1, notes: null }] })
+            expect(pedido.status).toBe(201)
+
+            const activos = await request(app).get('/api/v1/orders/active').set(...bearer(camareroD))
+            expect(activos.body.filter((o: { tableId: string }) => o.tableId === 'mesa-d1').map((o: { id: string }) => o.id))
+                .toEqual([pedido.body.id])
+
+            const liberada = await request(app).patch(`${URL_D}/mesa-d1/status`).set(...bearer(camareroD)).send({ status: 'libre' })
+            expect(liberada.body.status).toBe('libre')
+            expect(await disponibles()).toEqual(['mesa-d1'])
+
+            const tardio = await request(app).post('/api/v1/orders').set(...bearer(cliente))
+                .send({ restaurantId: 'rest-d', tableId: 'mesa-d1', items: [{ dishId: 'dish-d', quantity: 1, notes: null }] })
+            expect(tardio.status).toBe(400)
         })
     })
 })
