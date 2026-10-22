@@ -6,7 +6,8 @@ const NOT_FOUND_ERRORS = [
     'RestaurantNotFoundError',
     'IngredientNotFoundError',
     'DishNotFoundError',
-    'OrderNotFoundError'
+    'OrderNotFoundError',
+    'TableNotFoundError'
 ]
 
 const FORBIDDEN_ERRORS = [
@@ -16,6 +17,11 @@ const FORBIDDEN_ERRORS = [
 const UNAUTHORIZED_ERRORS = [
     'InvalidCredentialsError',
     'InvalidRefreshTokenError'
+]
+
+const CONFLICT_ERRORS = [
+    'DuplicatedTableNumberError',
+    'TableNotAvailableError'
 ]
 
 export const errorHandler = (err: any, _req: Request, res: Response, _next: NextFunction): void => {
@@ -28,6 +34,8 @@ export const errorHandler = (err: any, _req: Request, res: Response, _next: Next
             statusCode = 403
         } else if (UNAUTHORIZED_ERRORS.includes(err.name)) {
             statusCode = 401
+        } else if (CONFLICT_ERRORS.includes(err.name)) {
+            statusCode = 409
         }
 
         res.status(statusCode).json({
