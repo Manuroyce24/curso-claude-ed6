@@ -122,4 +122,28 @@ describe('TableService', () => {
             expect((await service.findById('rest-a', idMesa)).id).toBe(idMesa)
         })
     })
+
+    describe('changeStatus', () => {
+        let idMesa: string
+
+        beforeEach(async () => {
+            idMesa = (await service.create('rest-a', { ...datos, status: 'ocupada' })).id
+        })
+
+        it('libera una mesa ocupada y devuelve la mesa actualizada', async () => {
+            const mesa = await service.changeStatus('rest-a', idMesa, 'libre')
+            expect(mesa.status).toBe('libre')
+            expect((await service.findById('rest-a', idMesa)).status).toBe('libre')
+        })
+
+        it('rechaza un estado inválido sin modificar la mesa', async () => {
+            await expect(service.changeStatus('rest-a', idMesa, 'rota')).rejects.toThrow(InvalidTableStatusError)
+            expect((await service.findById('rest-a', idMesa)).status).toBe('ocupada')
+        })
+
+        it('no cambia una mesa de otro restaurante', async () => {
+            await expect(service.changeStatus('rest-b', idMesa, 'libre')).rejects.toThrow(TableNotFoundError)
+            expect((await service.findById('rest-a', idMesa)).status).toBe('ocupada')
+        })
+    })
 })
