@@ -157,7 +157,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. En la API se trabaja con TDD (tes
 
 - [x] **T25** (~10 min): Modelo `Table`, `TableService` (`getAll(restaurantId)`, `changeStatus`) y `TableStore` (con `restaurantId` del `AuthStore`, polling de 30 s como `OrderStore`) — `packages/web-empleados/src/app/features/tables/`
 - [x] **T26** (~10 min): `MesasComponent`: tarjetas por mesa con número, capacidad, estado y `<select>` para cambiarlo; arranca/para el polling de mesas y de `OrderStore` — `packages/web-empleados/src/app/features/tables/pages/mesas/`
-- [ ] **T27** (~10 min): En las mesas `ocupada`, listar los pedidos activos de `OrderStore` con `tableId === mesa.id` y el estado de cada plato — `packages/web-empleados/src/app/features/tables/pages/mesas/mesas.component.html`
+- [x] **T27** (~10 min): En las mesas `ocupada`, listar los pedidos activos de `OrderStore` con `tableId === mesa.id` y el estado de cada plato — `packages/web-empleados/src/app/features/tables/pages/mesas/mesas.component.html`
 - [ ] **T28** (~5 min): Ruta `/mesas` con `roleGuard` y `data.roles: ['camarero', 'manager']`; enlace "Mesas" en el shell visible solo para esos roles — `packages/web-empleados/src/app/app.routes.ts`
 
 **web-clientes**
