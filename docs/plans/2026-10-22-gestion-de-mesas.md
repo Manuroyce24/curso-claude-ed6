@@ -143,7 +143,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. En la API se trabaja con TDD (tes
 - [x] **T16** (~5 min): Helper `crearMesa(id, restaurantId, number, capacity, status)` — `packages/api/src/test/http.ts`
 - [x] **T17** (~10 min): Tests de rutas de gestión: 401 sin token, 403 cocinero y manager de otro restaurante, CRUD 201/200/204 como manager, 409 número duplicado, `PATCH status` como camarero — `packages/api/src/routes/table.routes.test.ts`
 - [x] **T18** (~10 min): Tests de rutas de cliente: `GET /available?people=4` filtra y ordena, 400 con `people=0`, `POST /:id/occupy` 200 y luego 409, 403 si lo llama un camarero; test en `order.routes.test.ts` de pedido con mesa no ocupada → 400 — `packages/api/src/routes/table.routes.test.ts`
-- [ ] **T19** (~10 min): Seed: 6 mesas para `rest-1` y 4 para `rest-2` con ids fijos (`INSERT OR IGNORE`), capacidades 2-8; el pedido de ejemplo usa una mesa real marcada `ocupada` en vez de `'5'` — `packages/api/src/scripts/seed.ts`
+- [x] **T19** (~10 min): Seed: 6 mesas para `rest-1` y 4 para `rest-2` con ids fijos (`INSERT OR IGNORE`), capacidades 2-8; el pedido de ejemplo usa una mesa real marcada `ocupada` en vez de `'5'` — `packages/api/src/scripts/seed.ts`
 
 **web-admin**
 
