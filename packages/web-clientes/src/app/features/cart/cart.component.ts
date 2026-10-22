@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core'
+import { Component, computed, inject, signal } from '@angular/core'
 import { Router, RouterLink } from '@angular/router'
 import { DecimalPipe } from '@angular/common'
 import { CartStore } from '../../core/store/cart.store'
@@ -45,6 +45,12 @@ import { OrderService } from '../../core/services/order.service'
 
           <aside class="order-summary card">
             <h3>Resumen</h3>
+            @if (table(); as mesa) {
+              <div class="summary-row">
+                <span>Mesa</span>
+                <strong>{{ mesa.tableNumber }}</strong>
+              </div>
+            }
             <div class="summary-row">
               <span>Items ({{ cartStore.itemCount() }})</span>
               <span>{{ cartStore.total() | number:'1.2-2' }} €</span>
@@ -65,6 +71,12 @@ import { OrderService } from '../../core/services/order.service'
             </button>
             @if (error()) {
               <p class="error-msg">{{ error() }}</p>
+            }
+            @if (tableLost()) {
+              <a [routerLink]="['/restaurants', cartStore.restaurantId(), 'mesa']" class="btn btn-secondary"
+                 style="width: 100%; justify-content: center; margin-top: 8px;">
+                Elegir mesa
+              </a>
             }
           </aside>
         </div>
@@ -175,6 +187,11 @@ export class CartComponent {
 
   readonly loading = signal(false)
   readonly error = signal<string | null>(null)
+  readonly tableLost = signal(false)
+  readonly table = computed(() => {
+    const restaurantId = this.cartStore.restaurantId()
+    return restaurantId ? this.cartStore.tableFor(restaurantId) : null
+  })
 
   increment(dishId: string): void {
     const item = this.cartStore.items().find(i => i.dish.id === dishId)
@@ -207,13 +224,22 @@ export class CartComponent {
       notes: item.notes || null
     }))
 
-    this.orderService.createOrder(restaurantId, items).subscribe({
+    const tableId = this.cartStore.tableFor(restaurantId)?.tableId ?? null
+
+    this.orderService.createOrder(restaurantId, tableId, items).subscribe({
       next: (order) => {
         this.cartStore.clear()
         this.router.navigate(['/orders', order.id])
       },
       error: (err) => {
-        this.error.set('Error al confirmar el pedido. Inténtalo de nuevo.')
+        // Si el personal ya ha liberado la mesa, la API rechaza el pedido: hay que elegir otra.
+        if (err?.status === 400 && err?.error?.message === 'Table is not occupied in this restaurant') {
+          this.cartStore.clearTable()
+          this.tableLost.set(true)
+          this.error.set('Tu mesa ya no está asignada. Elige una mesa para confirmar el pedido.')
+        } else {
+          this.error.set('Error al confirmar el pedido. Inténtalo de nuevo.')
+        }
         this.loading.set(false)
       }
     })
