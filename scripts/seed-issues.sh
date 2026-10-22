@@ -117,8 +117,13 @@ ensure_label() {
     return
   fi
 
-  if ! gh label list "${GH_REPO_ARGS[@]}" --search "$label" --json name -q '.[].name' \
-      | grep -Fxq "$label"; then
+  # No se usa `--search` (la búsqueda de GitHub devuelve resultados vacíos de forma
+  # intermitente) y la salida va a una variable: con `grep -q` en una tubería y
+  # pipefail, gh recibe SIGPIPE y la comprobación falla aunque la etiqueta exista.
+  local existing
+  existing=$(gh label list "${GH_REPO_ARGS[@]}" --limit 200 --json name -q '.[].name')
+
+  if ! grep -Fxq "$label" <<<"$existing"; then
     echo "Creando etiqueta '$label'..."
     gh label create "$label" --color "$(label_color "$label")" "${GH_REPO_ARGS[@]}" >/dev/null
   fi
