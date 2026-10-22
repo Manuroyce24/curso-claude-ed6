@@ -8,7 +8,8 @@ import {
     InvalidTableStatusError,
     DuplicatedTableNumberError,
     TableNotFoundError,
-    TableNotAvailableError
+    TableNotAvailableError,
+    InvalidPartySizeError
 } from '@errors/DomainErrors.js'
 
 const datos = { number: 1, description: 'Ventana', capacity: 4 }
@@ -144,6 +145,45 @@ describe('TableService', () => {
         it('no cambia una mesa de otro restaurante', async () => {
             await expect(service.changeStatus('rest-b', idMesa, 'libre')).rejects.toThrow(TableNotFoundError)
             expect((await service.findById('rest-a', idMesa)).status).toBe('ocupada')
+        })
+    })
+
+    describe('findAvailable y occupy', () => {
+        let ids: Record<string, string>
+
+        beforeEach(async () => {
+            ids = {
+                grande: (await service.create('rest-a', { number: 1, capacity: 8 })).id,
+                pequena: (await service.create('rest-a', { number: 2, capacity: 2 })).id,
+                mediana: (await service.create('rest-a', { number: 3, capacity: 4 })).id,
+                ocupada: (await service.create('rest-a', { number: 4, capacity: 4, status: 'ocupada' })).id,
+                reservada: (await service.create('rest-a', { number: 5, capacity: 4, status: 'reservada' })).id
+            }
+        })
+
+        it('devuelve las mesas libres con capacidad suficiente, de menor a mayor', async () => {
+            const mesas = await service.findAvailable('rest-a', 3)
+            expect(mesas.map(m => m.id)).toEqual([ids.mediana, ids.grande])
+        })
+
+        it.each([0, 51, 2.5, NaN, '3'])('rechaza %s personas', async (people) => {
+            await expect(service.findAvailable('rest-a', people as number)).rejects.toThrow(InvalidPartySizeError)
+        })
+
+        it('ocupa una mesa libre y devuelve la mesa ocupada', async () => {
+            const mesa = await service.occupy('rest-a', ids.mediana!)
+            expect(mesa).toMatchObject({ id: ids.mediana, status: 'ocupada' })
+            expect((await service.findById('rest-a', ids.mediana!)).status).toBe('ocupada')
+        })
+
+        it('rechaza ocupar una mesa ocupada o reservada con TableNotAvailableError', async () => {
+            await expect(service.occupy('rest-a', ids.ocupada!)).rejects.toThrow(TableNotAvailableError)
+            await expect(service.occupy('rest-a', ids.reservada!)).rejects.toThrow(TableNotAvailableError)
+        })
+
+        it('rechaza ocupar una mesa inexistente o de otro restaurante con TableNotFoundError', async () => {
+            await expect(service.occupy('rest-a', 'no-existe')).rejects.toThrow(TableNotFoundError)
+            await expect(service.occupy('rest-b', ids.mediana!)).rejects.toThrow(TableNotFoundError)
         })
     })
 })

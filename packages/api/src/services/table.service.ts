@@ -8,7 +8,8 @@ import {
     InvalidTableDescriptionError,
     DuplicatedTableNumberError,
     TableNotFoundError,
-    TableNotAvailableError
+    TableNotAvailableError,
+    InvalidPartySizeError
 } from '@errors/DomainErrors.js'
 
 const MAX_CAPACIDAD = 50
@@ -65,6 +66,22 @@ export class TableService {
         const updatedAt = new Date().toISOString()
         await this.tableRepository.updateStatus(id, nuevoEstado, updatedAt)
         return { ...table, status: nuevoEstado, updatedAt }
+    }
+
+    async findAvailable(restaurantId: string, people: number): Promise<Table[]> {
+        if (!esEnteroEntre(people, 1, MAX_CAPACIDAD)) {
+            throw new InvalidPartySizeError()
+        }
+        return this.tableRepository.findAvailable(restaurantId, people)
+    }
+
+    async occupy(restaurantId: string, id: string): Promise<Table> {
+        const updatedAt = new Date().toISOString()
+        if (!await this.tableRepository.occupyIfFree(id, restaurantId, updatedAt)) {
+            await this.findById(restaurantId, id)
+            throw new TableNotAvailableError()
+        }
+        return this.findById(restaurantId, id)
     }
 
     async delete(restaurantId: string, id: string): Promise<void> {
