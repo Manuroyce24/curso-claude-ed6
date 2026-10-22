@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <!--
+    CSP de producción (complementa la que genera security.autoCsp, que solo cubre script-src).
+    No incluye default-src ni script-src a propósito: así no bloquea los scripts con hash.
+    img-src admite https: porque los logos de restaurante son URLs externas.
+    frame-ancestors no se puede declarar en una meta: debe enviarlo el servidor como cabecera HTTP.
+  -->
+  <meta http-equiv="Content-Security-Policy" content="style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-src 'none'; worker-src 'self'; form-action 'self'; object-src 'none'; base-uri 'self'">
+  <title>WebClientes</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>

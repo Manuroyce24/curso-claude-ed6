@@ -28,12 +28,12 @@ Resumen de las medidas de seguridad de Resttek y de lo que debe configurar quien
 
 ## Frontend: CSP y cabeceras
 
-`web-empleados` genera en producción dos metaetiquetas CSP que se combinan:
+Los tres frontends (`web-empleados`, `web-admin` y `web-clientes`) generan en producción dos metaetiquetas CSP que se combinan:
 
 1. La de `security.autoCsp` (en `angular.json`): `script-src` con hashes de los scripts en línea y `strict-dynamic`.
-2. La de `src/index.prod.html`: `style-src`, `img-src`, `font-src`, `connect-src`, `frame-src`, `worker-src`, `form-action`, `object-src` y `base-uri`. No declara `default-src` ni `script-src` a propósito, para no bloquear los scripts con hash.
+2. La de `src/index.prod.html` (solo se usa en el build de producción): `style-src`, `img-src` (en `web-admin` y `web-clientes` admite también `https:` por los logos de restaurante), `font-src`, `connect-src`, `frame-src`, `worker-src`, `form-action`, `object-src` y `base-uri`. No declara `default-src` ni `script-src` a propósito, para no bloquear los scripts con hash.
 
-La fuente Inter se sirve en local (`@fontsource/inter`), así que la política no abre nada a terceros. `web-admin` y `web-clientes` todavía usan Google Fonts y no tienen CSP.
+La fuente Inter se sirve en local (`@fontsource/inter`), así que la política no abre nada a terceros.
 
 Una `<meta>` no admite `frame-ancestors`, `report-uri` ni `Content-Security-Policy-Report-Only`. Quien sirva los estáticos (nginx, CDN...) debe enviar estas cabeceras HTTP:
 
@@ -58,5 +58,5 @@ Recomendación para cambios futuros de la CSP: publicarla primero como `Content-
 - Los tokens (access y refresh) se guardan en `localStorage`. Un XSS que supere la CSP puede leerlos. Se compensa con una vida corta del access, la rotación del refresh y la CSP.
 - La rotación puede cerrar la sesión si dos pestañas renuevan a la vez con el mismo refresh. Dentro de una pestaña las renovaciones se serializan; entre pestañas no.
 - Los refresh tokens caducados no se purgan de la BBDD.
-- `sqlite3` 5.x arrastra avisos de `tar` y `cacache` (solo afectan a la instalación). Subir a `sqlite3` 6 es un cambio mayor.
+- `npm audit --omit=dev` está en 0 vulnerabilidades (`sqlite3` 6.0.1). Los avisos que quedan en `npm audit` son de herramientas de desarrollo y compilación.
 - `@angular/build` y `@angular/cli` están fijados en 21.2.6: las versiones posteriores rechazan el asset `../web-shared/src/lib/assets`, que queda fuera del workspace.
