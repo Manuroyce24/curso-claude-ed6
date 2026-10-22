@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import request from 'supertest'
 import app from '../app.js'
 import { dbConfig } from '@config/database.js'
-import { bearer, crearRestaurante } from '../test/http.js'
+import { bearer, crearRestaurante, crearMesa } from '../test/http.js'
 
 const managerA = { id: 'man-a', role: 'manager', restaurantId: 'rest-a' }
 const cliente = { id: 'cli-1', role: 'cliente', restaurantId: null }
@@ -14,6 +14,12 @@ describe('rutas /restaurants/:restaurantId/tables', () => {
         await dbConfig.initialize()
         await crearRestaurante('rest-a')
         await crearRestaurante('rest-b')
+        await crearMesa('mesa-b1', 'rest-b', 1, 4, 'reservada')
+    })
+
+    it('crearMesa inserta mesas para los tests', async () => {
+        const mesa = await dbConfig.get<{ status: string, capacity: number }>('SELECT status, capacity FROM restaurant_tables WHERE id = ?', ['mesa-b1'])
+        expect(mesa).toEqual({ status: 'reservada', capacity: 4 })
     })
 
     describe('montaje', () => {
