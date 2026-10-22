@@ -139,7 +139,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. En la API se trabaja con TDD (tes
 **API — controlador y rutas**
 
 - [x] **T14** (~10 min): `TableController` (estilo arrow functions de `DishController`) con `create`, `getAll`, `getById`, `update`, `changeStatus`, `delete`, `getAvailable` (lee `req.query.people` y lo convierte a número), `occupy` y `toJSON` — `packages/api/src/controllers/table.controller.ts`
-- [ ] **T15** (~10 min): `table.routes.ts` (`Router({ mergeParams: true })`) con los roles de la sección 5, `/available` antes de `/:id`; montarlo en `app.ts` en `/api/v1/restaurants/:restaurantId/tables`; pasar `SqliteTableRepository` a `OrderService` en `order.routes.ts` — `packages/api/src/routes/table.routes.ts`
+- [x] **T15** (~10 min): `table.routes.ts` (`Router({ mergeParams: true })`) con los roles de la sección 5, `/available` antes de `/:id`; montarlo en `app.ts` en `/api/v1/restaurants/:restaurantId/tables`; pasar `SqliteTableRepository` a `OrderService` en `order.routes.ts` — `packages/api/src/routes/table.routes.ts`
 - [ ] **T16** (~5 min): Helper `crearMesa(id, restaurantId, number, capacity, status)` — `packages/api/src/test/http.ts`
 - [ ] **T17** (~10 min): Tests de rutas de gestión: 401 sin token, 403 cocinero y manager de otro restaurante, CRUD 201/200/204 como manager, 409 número duplicado, `PATCH status` como camarero — `packages/api/src/routes/table.routes.test.ts`
 - [ ] **T18** (~10 min): Tests de rutas de cliente: `GET /available?people=4` filtra y ordena, 400 con `people=0`, `POST /:id/occupy` 200 y luego 409, 403 si lo llama un camarero; test en `order.routes.test.ts` de pedido con mesa no ocupada → 400 — `packages/api/src/routes/table.routes.test.ts`
