@@ -6,7 +6,9 @@ import {
     InvalidCapacityError,
     InvalidTableDescriptionError,
     InvalidTableStatusError,
-    DuplicatedTableNumberError
+    DuplicatedTableNumberError,
+    TableNotFoundError,
+    TableNotAvailableError
 } from '@errors/DomainErrors.js'
 
 const datos = { number: 1, description: 'Ventana', capacity: 4 }
@@ -71,6 +73,53 @@ describe('TableService', () => {
             await service.create('rest-b', datos)
             const mesas = await service.findByRestaurantId('rest-a')
             expect(mesas.map(m => m.number)).toEqual([1, 2])
+        })
+    })
+
+    describe('findById, update y delete', () => {
+        let idMesa: string
+
+        beforeEach(async () => {
+            idMesa = (await service.create('rest-a', datos)).id
+            await service.create('rest-a', { ...datos, number: 2 })
+        })
+
+        it('findById devuelve la mesa de su restaurante y falla para otro', async () => {
+            expect((await service.findById('rest-a', idMesa)).number).toBe(1)
+            await expect(service.findById('rest-b', idMesa)).rejects.toThrow(TableNotFoundError)
+        })
+
+        it('update modifica los datos y conserva id, restaurante y fecha de creación', async () => {
+            const original = await service.findById('rest-a', idMesa)
+            const editada = await service.update('rest-a', idMesa, { number: 5, description: null, capacity: 6, status: 'reservada' })
+            expect(editada).toMatchObject({ id: idMesa, number: 5, description: null, capacity: 6, status: 'reservada', restaurantId: 'rest-a', createdAt: original.createdAt })
+            expect(await service.findById('rest-a', idMesa)).toEqual(editada)
+        })
+
+        it('update permite mantener el propio número pero no usar el de otra mesa', async () => {
+            await expect(service.update('rest-a', idMesa, { ...datos, capacity: 8 })).resolves.toMatchObject({ capacity: 8 })
+            await expect(service.update('rest-a', idMesa, { ...datos, number: 2 })).rejects.toThrow(DuplicatedTableNumberError)
+        })
+
+        it('update no modifica una mesa de otro restaurante', async () => {
+            await expect(service.update('rest-b', idMesa, { ...datos, capacity: 8 })).rejects.toThrow(TableNotFoundError)
+            expect((await service.findById('rest-a', idMesa)).capacity).toBe(4)
+        })
+
+        it('update valida los datos', async () => {
+            await expect(service.update('rest-a', idMesa, { ...datos, capacity: 0 })).rejects.toThrow(InvalidCapacityError)
+        })
+
+        it('delete borra una mesa libre', async () => {
+            await service.delete('rest-a', idMesa)
+            await expect(service.findById('rest-a', idMesa)).rejects.toThrow(TableNotFoundError)
+        })
+
+        it('delete no borra una mesa ocupada ni una de otro restaurante', async () => {
+            await service.update('rest-a', idMesa, { ...datos, status: 'ocupada' })
+            await expect(service.delete('rest-a', idMesa)).rejects.toThrow(TableNotAvailableError)
+            await expect(service.delete('rest-b', idMesa)).rejects.toThrow(TableNotFoundError)
+            expect((await service.findById('rest-a', idMesa)).id).toBe(idMesa)
         })
     })
 })

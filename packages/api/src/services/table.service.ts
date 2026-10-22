@@ -6,7 +6,9 @@ import {
     InvalidTableNumberError,
     InvalidCapacityError,
     InvalidTableDescriptionError,
-    DuplicatedTableNumberError
+    DuplicatedTableNumberError,
+    TableNotFoundError,
+    TableNotAvailableError
 } from '@errors/DomainErrors.js'
 
 const MAX_CAPACIDAD = 50
@@ -37,6 +39,32 @@ export class TableService {
 
     async findByRestaurantId(restaurantId: string): Promise<Table[]> {
         return this.tableRepository.findByRestaurantId(restaurantId)
+    }
+
+    async findById(restaurantId: string, id: string): Promise<Table> {
+        const table = await this.tableRepository.findByIdInRestaurant(id, restaurantId)
+        if (!table) {
+            throw new TableNotFoundError()
+        }
+        return table
+    }
+
+    async update(restaurantId: string, id: string, input: TableInput): Promise<Table> {
+        const existing = await this.findById(restaurantId, id)
+        const datos = this.validar(input, existing.status)
+        await this.comprobarNumeroLibre(restaurantId, datos.number, id)
+
+        const updated: Table = { ...existing, ...datos, updatedAt: new Date().toISOString() }
+        await this.tableRepository.save(updated)
+        return updated
+    }
+
+    async delete(restaurantId: string, id: string): Promise<void> {
+        const table = await this.findById(restaurantId, id)
+        if (table.status === 'ocupada') {
+            throw new TableNotAvailableError()
+        }
+        await this.tableRepository.delete(id)
     }
 
     private async comprobarNumeroLibre(restaurantId: string, number: number, idActual?: string): Promise<void> {
