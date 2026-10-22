@@ -172,7 +172,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. En la API se trabaja con TDD (tes
 
 - [x] **T34** (~5 min): `npm test` en verde y `npm run build -w` de `web-admin`, `web-empleados` y `web-clientes` sin errores — (raíz)
 - [x] **T35** (~10 min): Verificación manual con `curl` y en el navegador según la sección 7 — (manual)
-- [ ] **T36** (~10 min): Documentar `restaurant_tables` en `docs/dominio/modelo-datos.md`, "Mesa" y sus estados en `docs/dominio/glosario.md`, los endpoints en `docs/arquitectura/arquitectura-api.md`, los permisos en `docs/arquitectura/seguridad.md` y las nuevas páginas en `docs/arquitectura/arquitectura-frontend.md` — `docs/`
+- [x] **T36** (~10 min): Documentar `restaurant_tables` en `docs/dominio/modelo-datos.md`, "Mesa" y sus estados en `docs/dominio/glosario.md`, los endpoints en `docs/arquitectura/arquitectura-api.md`, los permisos en `docs/arquitectura/seguridad.md` y las nuevas páginas en `docs/arquitectura/arquitectura-frontend.md` — `docs/`
 
 ## 7. Verificación
 

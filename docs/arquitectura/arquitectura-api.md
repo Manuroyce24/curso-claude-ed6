@@ -51,7 +51,7 @@ contexts/employee/
 
 `contexts/shared/` no es un bounded context de negocio: contiene el value object `Email` y los middlewares y el `errorHandler` de Express.
 
-### 2. Por capas → `restaurant`, `dish`, `ingredient`, `order`
+### 2. Por capas → `restaurant`, `dish`, `ingredient`, `order`, `table`
 
 El resto de dominios **no** usan bounded contexts. Se organizan en carpetas transversales por tipo de fichero:
 
@@ -66,7 +66,7 @@ src/
 
 Con un fichero por dominio en cada carpeta: `models/dish.model.ts`, `services/dish.service.ts`, `repositories/dish.repository.ts`, etc.
 
-**Diferencia clave**: aquí no hay entidades de dominio con comportamiento. `Restaurant`, `Dish`, `Ingredient` y `Order` son `interface` planas; la validación vive en los servicios y en funciones sueltas del modelo.
+**Diferencia clave**: aquí no hay entidades de dominio con comportamiento. `Restaurant`, `Dish`, `Ingredient`, `Order` y `Table` son `interface` planas; la validación vive en los servicios y en funciones sueltas del modelo.
 
 ---
 
@@ -310,6 +310,25 @@ Todos cuelgan de `/api/v1`. La columna **Roles** indica qué valores de `req.use
 
 Los ingredientes son **más restrictivos** que los platos: solo `admin` puede crear, editar o borrar.
 
+### Mesas
+
+Rutas en `routes/table.routes.ts`, montadas en `/api/v1/restaurants/:restaurantId/tables`. Las de gestión aplican `authorizeRestaurant` (el admin accede a cualquier restaurante; el resto solo al suyo).
+
+| Método | Ruta | Roles |
+| --- | --- | --- |
+| `GET` | `/api/v1/restaurants/:restaurantId/tables/available?people=N` | cliente — mesas `libre` con `capacity >= N`, de menor a mayor capacidad; 400 si `N` no es un entero 1-50 |
+| `POST` | `/api/v1/restaurants/:restaurantId/tables/:id/occupy` | cliente — 200 con la mesa ocupada; 404 si no existe en el restaurante; 409 si no está libre |
+| `POST` | `/api/v1/restaurants/:restaurantId/tables` | admin, manager — `{ number, description?, capacity, status? }`; 409 si el número ya existe |
+| `GET` | `/api/v1/restaurants/:restaurantId/tables` | admin, manager, camarero — ordenadas por número |
+| `GET` | `/api/v1/restaurants/:restaurantId/tables/:id` | admin, manager, camarero |
+| `PUT` | `/api/v1/restaurants/:restaurantId/tables/:id` | admin, manager |
+| `PATCH` | `/api/v1/restaurants/:restaurantId/tables/:id/status` | admin, manager, camarero — `{ status }`; es como se libera una mesa |
+| `DELETE` | `/api/v1/restaurants/:restaurantId/tables/:id` | admin, manager — 204; 409 si la mesa está ocupada |
+
+Las dos rutas del cliente se declaran antes de `/:id` y **no** usan `authorizeRestaurant`, porque el token de un cliente no lleva restaurante.
+
+Al crear un pedido con `tableId`, `OrderService` comprueba que la mesa es del restaurante del pedido y está `ocupada`; si no, responde 400 (`InvalidOrderError`, mensaje `Table is not occupied in this restaurant`). Los pedidos sin mesa (`tableId: null`) siguen permitidos.
+
 ### Pedidos
 
 | Método | Ruta | Roles |
@@ -345,7 +364,8 @@ Ambos responden directamente, sin pasar por el `errorHandler`.
 
 Jerarquía: `Error` → `AppError` (abstracta) → errores específicos en `errors/DomainErrors.ts`. `AppError` asigna `this.name = this.constructor.name`, y el `errorHandler` decide el código HTTP a partir de ese nombre:
 
-- **404**: `EmployeeNotFoundError`, `RestaurantNotFoundError`, `IngredientNotFoundError`, `DishNotFoundError`
+- **404**: `EmployeeNotFoundError`, `RestaurantNotFoundError`, `IngredientNotFoundError`, `DishNotFoundError`, `TableNotFoundError`
+- **409**: `DuplicatedTableNumberError`, `TableNotAvailableError`
 - **401**: `InvalidCredentialsError`
 - **400**: cualquier otro `AppError`
 - **500**: errores no controlados
