@@ -100,4 +100,44 @@ describe('SqliteTableRepository (Integration)', () => {
             expect(await repo.findByIdInRestaurant('mesa-b9', 'rest-b')).toBeNull()
         })
     })
+
+    describe('disponibilidad y ocupación', () => {
+        beforeAll(async () => {
+            await crearRestaurante('rest-c')
+            await insertarMesa('mesa-c1', 'rest-c', 1, 6)
+            await insertarMesa('mesa-c2', 'rest-c', 2, 2)
+            await insertarMesa('mesa-c3', 'rest-c', 3, 4)
+            await insertarMesa('mesa-c4', 'rest-c', 4, 4, 'reservada')
+            await insertarMesa('mesa-c5', 'rest-c', 5, 8, 'ocupada')
+            await insertarMesa('mesa-c6', 'rest-c', 6, 4)
+        })
+
+        it('devuelve solo las mesas libres con capacidad suficiente, de menor a mayor capacidad', async () => {
+            const mesas = await repo.findAvailable('rest-c', 3)
+            expect(mesas.map(m => m.id)).toEqual(['mesa-c3', 'mesa-c6', 'mesa-c1'])
+        })
+
+        it('ocupa una mesa libre y devuelve true', async () => {
+            expect(await repo.occupyIfFree('mesa-c2', 'rest-c', ahora)).toBe(true)
+            expect((await repo.findByIdInRestaurant('mesa-c2', 'rest-c'))?.status).toBe('ocupada')
+        })
+
+        it('devuelve false si la mesa ya estaba ocupada', async () => {
+            expect(await repo.occupyIfFree('mesa-c2', 'rest-c', ahora)).toBe(false)
+        })
+
+        it('devuelve false si la mesa está reservada o es de otro restaurante', async () => {
+            expect(await repo.occupyIfFree('mesa-c4', 'rest-c', ahora)).toBe(false)
+            expect(await repo.occupyIfFree('mesa-c3', 'rest-a', ahora)).toBe(false)
+            expect((await repo.findByIdInRestaurant('mesa-c3', 'rest-c'))?.status).toBe('libre')
+        })
+
+        it('solo una de dos ocupaciones simultáneas tiene éxito', async () => {
+            const resultados = await Promise.all([
+                repo.occupyIfFree('mesa-c6', 'rest-c', ahora),
+                repo.occupyIfFree('mesa-c6', 'rest-c', ahora)
+            ])
+            expect(resultados.filter(Boolean)).toHaveLength(1)
+        })
+    })
 })

@@ -22,6 +22,8 @@ export interface TableRepository {
     save(table: Table): Promise<void>
     updateStatus(id: string, status: TableStatusType, updatedAt: string): Promise<void>
     delete(id: string): Promise<void>
+    findAvailable(restaurantId: string, minCapacity: number): Promise<Table[]>
+    occupyIfFree(id: string, restaurantId: string, updatedAt: string): Promise<boolean>
 }
 
 export class SqliteTableRepository implements TableRepository {
@@ -71,6 +73,26 @@ export class SqliteTableRepository implements TableRepository {
 
     async delete(id: string): Promise<void> {
         await this.db.run('DELETE FROM restaurant_tables WHERE id = ?', [id])
+    }
+
+    async findAvailable(restaurantId: string, minCapacity: number): Promise<Table[]> {
+        const rows = await this.db.all<TableRow>(
+            `SELECT ${COLUMNS} FROM restaurant_tables
+             WHERE restaurant_id = ? AND status = 'libre' AND capacity >= ?
+             ORDER BY capacity, number`,
+            [restaurantId, minCapacity]
+        )
+        return rows.map(row => this.mapToTable(row))
+    }
+
+    // Un único UPDATE condicionado al estado: si dos clientes eligen la misma mesa, solo uno la ocupa.
+    async occupyIfFree(id: string, restaurantId: string, updatedAt: string): Promise<boolean> {
+        const result = await this.db.run(
+            `UPDATE restaurant_tables SET status = 'ocupada', updated_at = ?
+             WHERE id = ? AND restaurant_id = ? AND status = 'libre'`,
+            [updatedAt, id, restaurantId]
+        )
+        return result.changes === 1
     }
 
     private mapToTable(row: TableRow): Table {

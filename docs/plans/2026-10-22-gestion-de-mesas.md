@@ -125,7 +125,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. En la API se trabaja con TDD (tes
 
 - [x] **T5** (~10 min): `TableRepository` + `SqliteTableRepository` con `findByRestaurantId` (orden por `number`), `findByIdInRestaurant`, `findByNumber(restaurantId, number)` y mapeo fila→`Table`; test `table.repository.test.ts` con BD `:memory:` — `packages/api/src/repositories/table.repository.ts`
 - [x] **T6** (~10 min): Métodos `save` (insert/update con `ON CONFLICT(id) DO UPDATE`), `delete` y `updateStatus`; tests — `packages/api/src/repositories/table.repository.ts`
-- [ ] **T7** (~10 min): `findAvailable(restaurantId, minCapacity)` (`status = 'libre' AND capacity >= ?` ordenado por `capacity, number`) y `occupyIfFree(id, restaurantId): Promise<boolean>` atómico; tests incluido que una segunda ocupación devuelve `false` — `packages/api/src/repositories/table.repository.ts`
+- [x] **T7** (~10 min): `findAvailable(restaurantId, minCapacity)` (`status = 'libre' AND capacity >= ?` ordenado por `capacity, number`) y `occupyIfFree(id, restaurantId): Promise<boolean>` atómico; tests incluido que una segunda ocupación devuelve `false` — `packages/api/src/repositories/table.repository.ts`
 - [ ] **T8** (~5 min): `MockTableRepository` en memoria con los mismos métodos — `packages/api/src/repositories/mocks/MockTableRepository.ts`
 
 **API — servicio**
