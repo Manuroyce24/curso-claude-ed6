@@ -162,7 +162,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. En la API se trabaja con TDD (tes
 
 **web-clientes**
 
-- [ ] **T29** (~5 min): Modelo `Table` y `TableService` (`getAvailable(restaurantId, people)`, `occupy(restaurantId, tableId)`) — `packages/web-clientes/src/app/core/{models,services}/`
+- [x] **T29** (~5 min): Modelo `Table` y `TableService` (`getAvailable(restaurantId, people)`, `occupy(restaurantId, tableId)`) — `packages/web-clientes/src/app/core/{models,services}/`
 - [ ] **T30** (~10 min): `CartStore`: signal `tableId` con `setTable(restaurantId, tableId)`, persistencia en `sessionStorage` con `try/catch`; `clear()` conserva la mesa y se añade `clearTable()`; `addItem` de otro restaurante no hereda la mesa — `packages/web-clientes/src/app/core/store/cart.store.ts`
 - [ ] **T31** (~10 min): `TableSelectionComponent`: input de número de personas, botón "Buscar mesas", lista de mesas disponibles seleccionables y botón "Continuar" que llama a `occupy`, guarda la mesa en `CartStore` y navega a `/restaurants/:id`; si la API devuelve 409, avisa y recarga la lista — `packages/web-clientes/src/app/features/tables/table-selection.component.ts`
 - [ ] **T32** (~5 min): Ruta `restaurants/:id/mesa`; el listado de restaurantes enlaza a ella; `RestaurantMenuComponent` redirige a `/restaurants/:id/mesa` si no hay mesa elegida para ese restaurante — `packages/web-clientes/src/app/app.routes.ts`
