@@ -119,7 +119,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. En la API se trabaja con TDD (tes
 - [x] **T1** (~5 min): Añadir `CREATE TABLE IF NOT EXISTS restaurant_tables (id TEXT PK, restaurant_id TEXT NOT NULL FK, number INTEGER NOT NULL, description TEXT, capacity INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'libre', created_at, updated_at, UNIQUE(restaurant_id, number))` e índice por `restaurant_id`; test en `database.test.ts` que comprueba que la tabla existe — `packages/api/src/config/database.ts`
 - [x] **T2** (~5 min): Añadir los errores de mesa (`TableNotFoundError`, `TableNumberRequiredError`, `InvalidCapacityError`, `InvalidTableStatusError`, `InvalidPartySizeError`, `DuplicatedTableNumberError`, `TableNotAvailableError`) — `packages/api/src/errors/DomainErrors.ts`
 - [x] **T3** (~5 min): En `errorHandler`, `TableNotFoundError` en `NOT_FOUND_ERRORS` y nueva lista `CONFLICT_ERRORS` (`DuplicatedTableNumberError`, `TableNotAvailableError`) → 409; tests en `errorHandler.test.ts` — `packages/api/src/contexts/shared/infrastructure/http/errorHandler.ts`
-- [ ] **T4** (~5 min): Crear `table.model.ts` con `Table`, `VALID_TABLE_STATUSES`, `TableStatusType` y `normalizeTableStatus` (lanza `InvalidTableStatusError`); test `table.model.test.ts` — `packages/api/src/models/table.model.ts`
+- [x] **T4** (~5 min): Crear `table.model.ts` con `Table`, `VALID_TABLE_STATUSES`, `TableStatusType` y `normalizeTableStatus` (lanza `InvalidTableStatusError`); test `table.model.test.ts` — `packages/api/src/models/table.model.ts`
 
 **API — repositorio**
 
