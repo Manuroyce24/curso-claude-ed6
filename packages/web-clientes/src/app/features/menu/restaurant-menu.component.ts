@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core'
-import { ActivatedRoute, RouterLink } from '@angular/router'
+import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import { DecimalPipe } from '@angular/common'
 import { LucideAngularModule } from 'lucide-angular'
 import { DishService } from '../../core/services/dish.service'
@@ -17,6 +17,9 @@ import { Restaurant } from '../../core/models/restaurant.model'
         <div>
           <a routerLink="/restaurants" class="back-link">← Volver a restaurantes</a>
           <h1>{{ restaurant()?.name || 'Cargando...' }}</h1>
+          @if (table(); as mesa) {
+            <p class="table-info">Mesa {{ mesa.tableNumber }}</p>
+          }
         </div>
       </div>
 
@@ -198,6 +201,11 @@ import { Restaurant } from '../../core/models/restaurant.model'
     .item-price {
       color: var(--text-primary);
     }
+    .table-info {
+      color: var(--green-light);
+      font-weight: 600;
+      margin-top: 4px;
+    }
     .cart-total {
       display: flex;
       justify-content: space-between;
@@ -209,12 +217,14 @@ import { Restaurant } from '../../core/models/restaurant.model'
 })
 export class RestaurantMenuComponent implements OnInit {
   private readonly route = inject(ActivatedRoute)
+  private readonly router = inject(Router)
   private readonly dishService = inject(DishService)
   private readonly restaurantService = inject(RestaurantService)
   readonly cartStore = inject(CartStore)
 
   readonly restaurant = signal<Restaurant | null>(null)
   readonly dishes = signal<Dish[]>([])
+  readonly table = computed(() => this.cartStore.tableFor(this.route.snapshot.paramMap.get('id')!))
   readonly loading = signal(true)
   readonly error = signal<string | null>(null)
   private quantities = signal<Record<string, number>>({})
@@ -234,6 +244,11 @@ export class RestaurantMenuComponent implements OnInit {
 
   ngOnInit(): void {
     const restaurantId = this.route.snapshot.paramMap.get('id')!
+    // Antes de ver la carta hay que elegir mesa en este restaurante.
+    if (!this.cartStore.tableFor(restaurantId)) {
+      this.router.navigate(['/restaurants', restaurantId, 'mesa'])
+      return
+    }
     this.loadData(restaurantId)
   }
 
