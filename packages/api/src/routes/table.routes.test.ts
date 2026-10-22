@@ -117,4 +117,49 @@ describe('rutas /restaurants/:restaurantId/tables', () => {
             expect(res.status).toBe(201)
         })
     })
+
+    describe('flujo del cliente', () => {
+        const URL_C = '/api/v1/restaurants/rest-c/tables'
+
+        beforeAll(async () => {
+            await crearRestaurante('rest-c')
+            await crearMesa('mesa-c1', 'rest-c', 1, 6)
+            await crearMesa('mesa-c2', 'rest-c', 2, 2)
+            await crearMesa('mesa-c3', 'rest-c', 3, 4)
+            await crearMesa('mesa-c4', 'rest-c', 4, 4, 'ocupada')
+            await crearMesa('mesa-c5', 'rest-c', 5, 8, 'reservada')
+        })
+
+        it('GET /available devuelve las mesas libres con capacidad suficiente, de menor a mayor', async () => {
+            const res = await request(app).get(`${URL_C}/available?people=4`).set(...bearer(cliente))
+            expect(res.status).toBe(200)
+            expect(res.body.map((m: { id: string }) => m.id)).toEqual(['mesa-c3', 'mesa-c1'])
+        })
+
+        it.each(['0', '51', 'abc'])('GET /available rechaza people=%s con 400', async (people) => {
+            const res = await request(app).get(`${URL_C}/available?people=${people}`).set(...bearer(cliente))
+            expect(res.status).toBe(400)
+            expect(res.body.error).toBe('InvalidPartySizeError')
+        })
+
+        it('GET /available y POST /occupy solo son para clientes', async () => {
+            expect((await request(app).get(`${URL_C}/available?people=2`).set(...bearer(camareroA))).status).toBe(403)
+            expect((await request(app).post(`${URL_C}/mesa-c2/occupy`).set(...bearer(camareroA))).status).toBe(403)
+            expect((await request(app).get(`${URL_C}/available?people=2`)).status).toBe(401)
+        })
+
+        it('POST /occupy ocupa la mesa y una segunda vez devuelve 409', async () => {
+            const res = await request(app).post(`${URL_C}/mesa-c2/occupy`).set(...bearer(cliente))
+            expect(res.status).toBe(200)
+            expect(res.body).toMatchObject({ id: 'mesa-c2', status: 'ocupada' })
+
+            const otra = await request(app).post(`${URL_C}/mesa-c2/occupy`).set(...bearer(cliente))
+            expect(otra.status).toBe(409)
+            expect(otra.body.error).toBe('TableNotAvailableError')
+        })
+
+        it('POST /occupy devuelve 404 para una mesa de otro restaurante', async () => {
+            expect((await request(app).post(`${URL_C}/mesa-b1/occupy`).set(...bearer(cliente))).status).toBe(404)
+        })
+    })
 })

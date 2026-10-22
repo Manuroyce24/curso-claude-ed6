@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from 'vitest'
 import request from 'supertest'
 import app from '../app.js'
 import { dbConfig } from '@config/database.js'
-import { bearer, crearRestaurante, crearPlato, crearPedido } from '../test/http.js'
+import { bearer, crearRestaurante, crearPlato, crearPedido, crearMesa } from '../test/http.js'
 
 const cocineroA = { id: 'emp-a', role: 'cocinero', restaurantId: 'rest-a' }
 const cocineroB = { id: 'emp-b', role: 'cocinero', restaurantId: 'rest-b' }
@@ -19,6 +19,8 @@ describe('rutas /orders', () => {
         await crearPlato('dish-b', 'rest-b')
         await crearPedido('order-a', 'rest-a', 'cli-1', 'dish-a', 'item-a')
         await crearPedido('order-b', 'rest-b', 'cli-9', 'dish-b', 'item-b')
+        await crearMesa('mesa-a-ocupada', 'rest-a', 1, 4, 'ocupada')
+        await crearMesa('mesa-a-libre', 'rest-a', 2, 4)
     })
 
     describe('GET /orders/active', () => {
@@ -98,6 +100,20 @@ describe('rutas /orders', () => {
             const res = await request(app).post('/api/v1/orders').set(...bearer(clienteDueno))
                 .send({ restaurantId: 'rest-a', items: [{ dishId: 'dish-b', quantity: 1, notes: null }] })
             expect(res.status).toBe(400)
+        })
+
+        it('acepta un pedido en una mesa ocupada del restaurante', async () => {
+            const res = await request(app).post('/api/v1/orders').set(...bearer(clienteDueno))
+                .send({ restaurantId: 'rest-a', tableId: 'mesa-a-ocupada', items: [{ dishId: 'dish-a', quantity: 1, notes: null }] })
+            expect(res.status).toBe(201)
+            expect(res.body.tableId).toBe('mesa-a-ocupada')
+        })
+
+        it('rechaza un pedido en una mesa no ocupada con 400', async () => {
+            const res = await request(app).post('/api/v1/orders').set(...bearer(clienteDueno))
+                .send({ restaurantId: 'rest-a', tableId: 'mesa-a-libre', items: [{ dishId: 'dish-a', quantity: 1, notes: null }] })
+            expect(res.status).toBe(400)
+            expect(res.body.message).toBe('Table is not occupied in this restaurant')
         })
 
         it('no filtra mensajes internos en errores inesperados', async () => {
