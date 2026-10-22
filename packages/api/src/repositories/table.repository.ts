@@ -1,5 +1,5 @@
 import { Database } from '@config/database.js'
-import type { Table } from '@models/table.model.js'
+import type { Table, TableStatusType } from '@models/table.model.js'
 import { normalizeTableStatus } from '@models/table.model.js'
 
 interface TableRow {
@@ -19,6 +19,9 @@ export interface TableRepository {
     findByRestaurantId(restaurantId: string): Promise<Table[]>
     findByIdInRestaurant(id: string, restaurantId: string): Promise<Table | null>
     findByNumber(restaurantId: string, number: number): Promise<Table | null>
+    save(table: Table): Promise<void>
+    updateStatus(id: string, status: TableStatusType, updatedAt: string): Promise<void>
+    delete(id: string): Promise<void>
 }
 
 export class SqliteTableRepository implements TableRepository {
@@ -46,6 +49,28 @@ export class SqliteTableRepository implements TableRepository {
             [restaurantId, number]
         )
         return row ? this.mapToTable(row) : null
+    }
+
+    async save(table: Table): Promise<void> {
+        await this.db.run(
+            `INSERT INTO restaurant_tables (id, restaurant_id, number, description, capacity, status, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             ON CONFLICT(id) DO UPDATE SET
+                number = excluded.number,
+                description = excluded.description,
+                capacity = excluded.capacity,
+                status = excluded.status,
+                updated_at = excluded.updated_at`,
+            [table.id, table.restaurantId, table.number, table.description, table.capacity, table.status, table.createdAt, table.updatedAt]
+        )
+    }
+
+    async updateStatus(id: string, status: TableStatusType, updatedAt: string): Promise<void> {
+        await this.db.run('UPDATE restaurant_tables SET status = ?, updated_at = ? WHERE id = ?', [status, updatedAt, id])
+    }
+
+    async delete(id: string): Promise<void> {
+        await this.db.run('DELETE FROM restaurant_tables WHERE id = ?', [id])
     }
 
     private mapToTable(row: TableRow): Table {

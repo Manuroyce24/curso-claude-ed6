@@ -63,4 +63,41 @@ describe('SqliteTableRepository (Integration)', () => {
             expect(await repo.findByNumber('rest-b', 2)).toBeNull()
         })
     })
+
+    describe('escritura', () => {
+        const nueva = {
+            id: 'mesa-b9',
+            number: 9,
+            description: null,
+            capacity: 8,
+            status: 'libre' as const,
+            restaurantId: 'rest-b',
+            createdAt: ahora,
+            updatedAt: ahora
+        }
+
+        it('inserta una mesa nueva', async () => {
+            await repo.save(nueva)
+            expect(await repo.findByIdInRestaurant('mesa-b9', 'rest-b')).toEqual(nueva)
+        })
+
+        it('actualiza una mesa existente', async () => {
+            const editada = { ...nueva, number: 10, description: 'Terraza', capacity: 6, status: 'reservada' as const, updatedAt: '2026-10-23T10:00:00.000Z' }
+            await repo.save(editada)
+            expect(await repo.findByIdInRestaurant('mesa-b9', 'rest-b')).toEqual(editada)
+        })
+
+        it('cambia solo el estado y la fecha de actualización', async () => {
+            await repo.updateStatus('mesa-b9', 'ocupada', '2026-10-24T10:00:00.000Z')
+            const mesa = await repo.findByIdInRestaurant('mesa-b9', 'rest-b')
+            expect(mesa?.status).toBe('ocupada')
+            expect(mesa?.updatedAt).toBe('2026-10-24T10:00:00.000Z')
+            expect(mesa?.number).toBe(10)
+        })
+
+        it('borra una mesa', async () => {
+            await repo.delete('mesa-b9')
+            expect(await repo.findByIdInRestaurant('mesa-b9', 'rest-b')).toBeNull()
+        })
+    })
 })
