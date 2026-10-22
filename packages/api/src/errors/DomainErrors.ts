@@ -192,3 +192,51 @@ export class InvalidRefreshTokenError extends AppError {
         super('Invalid or expired refresh token')
     }
 }
+
+export class TableNotFoundError extends AppError {
+    constructor() {
+        super('Table not found')
+    }
+}
+
+export class InvalidTableNumberError extends AppError {
+    constructor() {
+        super('Table number must be an integer greater than 0')
+    }
+}
+
+export class InvalidCapacityError extends AppError {
+    constructor() {
+        super('Capacity must be an integer between 1 and 50')
+    }
+}
+
+export class InvalidTableDescriptionError extends AppError {
+    constructor() {
+        super('Description must be a text of up to 200 characters')
+    }
+}
+
+export class InvalidTableStatusError extends AppError {
+    constructor(message?: string) {
+        super(message ?? 'Invalid table status')
+    }
+}
+
+export class InvalidPartySizeError extends AppError {
+    constructor() {
+        super('People must be an integer between 1 and 50')
+    }
+}
+
+export class DuplicatedTableNumberError extends AppError {
+    constructor() {
+        super('Table number is already in use in this restaurant')
+    }
+}
+
+export class TableNotAvailableError extends AppError {
+    constructor() {
+        super('Table is not available')
+    }
+}
