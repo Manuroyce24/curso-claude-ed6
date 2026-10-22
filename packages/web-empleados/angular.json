@@ -22,11 +22,6 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              },
-              {
-                "glob": "**/*",
-                "input": "../web-shared/src/lib/assets",
-                "output": "/assets"
               }
             ],
             "styles": [

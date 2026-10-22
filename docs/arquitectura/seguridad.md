@@ -58,5 +58,5 @@ Recomendación para cambios futuros de la CSP: publicarla primero como `Content-
 - Los tokens (access y refresh) se guardan en `localStorage`. Un XSS que supere la CSP puede leerlos. Se compensa con una vida corta del access, la rotación del refresh y la CSP.
 - La rotación puede cerrar la sesión si dos pestañas renuevan a la vez con el mismo refresh. Dentro de una pestaña las renovaciones se serializan; entre pestañas no.
 - Los refresh tokens caducados no se purgan de la BBDD.
-- `npm audit --omit=dev` está en 0 vulnerabilidades (`sqlite3` 6.0.1). Los avisos que quedan en `npm audit` son de herramientas de desarrollo y compilación.
-- `@angular/build` y `@angular/cli` están fijados en 21.2.6: las versiones posteriores rechazan el asset `../web-shared/src/lib/assets`, que queda fuera del workspace.
+- `npm audit --omit=dev` está en 0 vulnerabilidades (`sqlite3` 6.0.1).
+- `npm audit` mantiene 3 avisos (2 bajos y 1 alto) de `vite` 7.3.6 y `esbuild` 0.27.x, que `@angular/build` 21.2.27 fija con versión exacta. Solo afectan al servidor de desarrollo (`ng serve`); no llegan al build ni a producción. Se resolverán al publicarse una versión de `@angular/build` con `vite` ≥ 7.3.7.

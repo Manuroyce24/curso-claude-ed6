@@ -143,7 +143,7 @@ web-shared/src/
     ├── components/
     │   ├── login/            → Componente de login reutilizable
     │   └── register/         → Componente de registro
-    ├── assets/images/        → Imágenes copiadas al build de cada app
+    ├── assets/images/        → Imágenes; cada app las expone con un enlace simbólico public/assets → web-shared/src/lib/assets
     └── styles/
         └── base.css          → Design system (ver aviso más abajo)
 ```
