@@ -17,13 +17,46 @@ export interface CartItem {
   notes: string
 }
 
+export interface SelectedTable {
+  restaurantId: string
+  tableId: string
+  tableNumber: number
+}
+
+const CLAVE_MESA = 'resttek.mesa'
+
+// La mesa elegida queda ocupada en la API: se guarda en sessionStorage para no perderla al recargar.
+function leerMesaGuardada(): SelectedTable | null {
+  try {
+    const guardada = JSON.parse(sessionStorage.getItem(CLAVE_MESA) ?? 'null')
+    return guardada && typeof guardada.restaurantId === 'string' && typeof guardada.tableId === 'string'
+      && typeof guardada.tableNumber === 'number' ? guardada : null
+  } catch {
+    return null
+  }
+}
+
+function guardarMesa(mesa: SelectedTable | null): void {
+  try {
+    if (mesa) {
+      sessionStorage.setItem(CLAVE_MESA, JSON.stringify(mesa))
+    } else {
+      sessionStorage.removeItem(CLAVE_MESA)
+    }
+  } catch {
+    // Sin almacenamiento disponible (modo privado, cookies bloqueadas…): la mesa vive solo en memoria.
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class CartStore {
   private readonly _items = signal<CartItem[]>([])
   private readonly _restaurantId = signal<string | null>(null)
+  private readonly _table = signal<SelectedTable | null>(leerMesaGuardada())
 
   readonly items = this._items.asReadonly()
   readonly restaurantId = this._restaurantId.asReadonly()
+  readonly table = this._table.asReadonly()
 
   readonly total = computed(() =>
     this._items().reduce((sum, item) => sum + item.dish.price * item.quantity, 0)
@@ -74,8 +107,25 @@ export class CartStore {
     this._items.set(items)
   }
 
+  // Vacía solo los platos: la mesa se conserva para poder hacer más pedidos desde ella.
   clear(): void {
     this._items.set([])
     this._restaurantId.set(null)
+  }
+
+  setTable(restaurantId: string, tableId: string, tableNumber: number): void {
+    const mesa = { restaurantId, tableId, tableNumber }
+    this._table.set(mesa)
+    guardarMesa(mesa)
+  }
+
+  tableFor(restaurantId: string): SelectedTable | null {
+    const mesa = this._table()
+    return mesa?.restaurantId === restaurantId ? mesa : null
+  }
+
+  clearTable(): void {
+    this._table.set(null)
+    guardarMesa(null)
   }
 }
