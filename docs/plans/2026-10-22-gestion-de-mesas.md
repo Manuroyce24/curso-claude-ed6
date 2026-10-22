@@ -148,7 +148,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. En la API se trabaja con TDD (tes
 **web-admin**
 
 - [x] **T20** (~5 min): Modelo `Table`, `TableStatus`, `CreateTableDto` y `TableService` HTTP (`getAll`, `getById`, `create`, `update`, `delete`) — `packages/web-admin/src/app/features/tables/{models,services}/`
-- [ ] **T21** (~5 min): `TableStore` con signals (`tables`, `loading`, `error`) y `loadByRestaurant`, `create`, `update`, `delete`, igual que `DishStore` — `packages/web-admin/src/app/features/tables/store/table.store.ts`
+- [x] **T21** (~5 min): `TableStore` con signals (`tables`, `loading`, `error`) y `loadByRestaurant`, `create`, `update`, `delete`, igual que `DishStore` — `packages/web-admin/src/app/features/tables/store/table.store.ts`
 - [ ] **T22** (~10 min): `TableListComponent`: tabla con número, descripción, capacidad y estado (badge), botones editar/borrar con confirmación y mensaje de error si la API devuelve 409 — `packages/web-admin/src/app/features/tables/pages/table-list/`
 - [ ] **T23** (~10 min): `TableFormComponent` (alta/edición) con validación de número ≥ 1, capacidad 1-50 y selector de estado; muestra el error de número duplicado — `packages/web-admin/src/app/features/tables/pages/table-form/`
 - [ ] **T24** (~5 min): `tables.routes.ts` (`''`, `new`, `:id/edit`), ruta `tables` en `app.routes.ts`, enlace "Mesas" en el menú lateral y tarjeta en el dashboard del restaurante — `packages/web-admin/src/app/app.routes.ts`
