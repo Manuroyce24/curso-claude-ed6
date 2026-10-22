@@ -1,0 +1,44 @@
+<div class="page-header">
+  <h1>Mesas</h1>
+</div>
+
+@if (tableStore.loading() && tableStore.tables().length === 0) {
+  <div class="spinner"></div>
+}
+
+@if (tableStore.error()) {
+  <div class="alert-error">{{ tableStore.error() }}</div>
+}
+
+@if (!tableStore.loading() || tableStore.tables().length > 0) {
+  @if (tableStore.tables().length === 0) {
+    <div class="empty-state">
+      <p>No hay mesas en este restaurante</p>
+    </div>
+  } @else {
+    <div class="tables-grid">
+      @for (mesa of tableStore.tables(); track mesa.id) {
+        <div class="table-card status-{{ mesa.status }}">
+          <div class="table-header">
+            <div class="table-title">
+              <span class="table-number">Mesa {{ mesa.number }}</span>
+              <span class="table-capacity">{{ mesa.capacity }} personas</span>
+            </div>
+            <span class="status-badge">{{ getStatusLabel(mesa.status) }}</span>
+          </div>
+          @if (mesa.description) {
+            <p class="table-description">{{ mesa.description }}</p>
+          }
+          <div class="table-actions">
+            <label [for]="'estado-' + mesa.id">Estado</label>
+            <select [id]="'estado-' + mesa.id" class="form-control" (change)="onChangeStatus(mesa.id, $event)">
+              @for (s of statuses; track s) {
+                <option [value]="s" [selected]="s === mesa.status">{{ getStatusLabel(s) }}</option>
+              }
+            </select>
+          </div>
+        </div>
+      }
+    </div>
+  }
+}
