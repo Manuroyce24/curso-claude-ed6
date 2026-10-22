@@ -1,7 +1,7 @@
 name: implement-plan
-description: Implementa un plan de docs/plans/ (generado con plan-feature) creando una rama desde development y aplicando TDD estricto tarea a tarea, con un commit por tarea y marcando cada tarea como hecha en el plan. Úsala cuando el usuario pida implementar, desarrollar o ejecutar un plan. Requiere que se adjunte el plan.
+description: Implementa un plan de docs/plans/ (generado con plan-feature) creando una rama desde development en un git worktree propio (uno por agente si varios agentes implementan distintas apps) y aplicando TDD estricto tarea a tarea, con un commit por tarea y marcando cada tarea como hecha en el plan. Úsala cuando el usuario pida implementar, desarrollar o ejecutar un plan. Requiere que se adjunte el plan.
 argument-hint: <ruta del plan> [nº de ticket]
-allowed-tools: Bash(git status:*), Bash(git branch:*), Bash(git checkout:*), Bash(git switch:*), Bash(git rev-parse:*), Bash(git add:*), Bash(git commit:*), Bash(git log:*), Bash(git diff:*), Bash(npx vitest:*), Bash(npm test:*), Bash(npm install:*), Bash(npm i:*), mcp__slack__slack_list_channels, mcp__slack__slack_post_message
+allowed-tools: Bash(git status:*), Bash(git branch:*), Bash(git checkout:*), Bash(git switch:*), Bash(git worktree:*), Bash(git rev-parse:*), Bash(git add:*), Bash(git commit:*), Bash(git log:*), Bash(git diff:*), Bash(npx vitest:*), Bash(npm test:*), Bash(npm install:*), Bash(npm i:*), mcp__slack__slack_list_channels, mcp__slack__slack_post_message
 ---
 
 # Implementar un plan con TDD estricto
@@ -33,7 +33,27 @@ Formato obligatorio: `<tipo-cambio>/<num-ticket>-<breve-descripcion>`
 - `breve-descripcion`: kebab-case, sin acentos, 2-5 palabras (normalmente el slug del plan sin la fecha ni el prefijo `fix-`).
 - Ejemplo: `feat/123-asociar-vendehumo-usuario`.
 
-Crea la rama desde `development` y cámbiate a ella: `git switch -c <rama> development`. Si la rama ya existe, no la sobrescribas: pregunta al usuario si continuar en ella (útil para reanudar un plan a medias).
+Si la rama ya existe, no la sobrescribas: pregunta al usuario si continuar en ella (útil para reanudar un plan a medias). La rama **no se crea con `git switch -c`**, sino junto con su worktree (ver 1.3).
+
+### 1.3 Worktree de trabajo
+
+Todos los cambios se hacen en un **`git worktree`** propio, nunca en el directorio principal del repositorio, que permanece intacto en su rama actual.
+
+1. Ruta del worktree: carpeta hermana del repositorio, fuera de él, con el formato `../<nombre-repo>-worktrees/<rama con "/" sustituido por "-">` (p. ej. `../base-curso-desarrollo-con-ia-worktrees/feat-123-filtro-por-nombre`).
+2. Créalo junto con la rama desde `development`: `git worktree add -b <rama> <ruta> development`.
+   - Si la rama ya existe y el usuario confirma continuar en ella: `git worktree add <ruta> <rama>`. Si la rama ya está desplegada en otro worktree (`git worktree list`), reutiliza ese en lugar de crear otro.
+3. A partir de aquí, **todos los comandos** (tests, `git add`, `git commit`, `npm install`…) se ejecutan dentro del worktree (`cd <ruta>` o `git -C <ruta>`), y las rutas de archivos que edites son las del worktree, incluido el plan.
+4. Un worktree nuevo no tiene `node_modules`: ejecuta `npm install` en él antes del Paso 2.
+5. Si el plan no está versionado (no existe en `development`), cópialo al worktree y trabaja con esa copia; se incluirá en el primer commit que lo modifique.
+
+### 1.4 Plan que afecta a varias aplicaciones con varios agentes
+
+Aplica solo si el plan afecta a varias aplicaciones (paquetes de `packages/`) **y el usuario pide que varios agentes las implementen, cada uno una app**. Si la implementa un único agente, usa un solo worktree (1.3).
+
+1. Genera **un worktree y una rama por agente/app**, todos desde `development`. La rama añade la app como sufijo: `<tipo-cambio>/<num-ticket>-<breve-descripcion>-<app>` (p. ej. `feat/123-filtro-por-nombre-api`, `feat/123-filtro-por-nombre-web-admin`) y el worktree sigue el formato de 1.3 con ese nombre de rama.
+2. Lanza un agente por app, indicándole en su prompt: la ruta de **su** worktree (único donde puede escribir), su rama, la app a su cargo, **solo las tareas del plan que corresponden a esa app** y que siga los Pasos 2 a 4 en su worktree. Los agentes no tocan el worktree de otro ni el directorio principal.
+3. Cada agente marca como hechas únicamente sus tareas en la copia del plan de su worktree, para evitar conflictos al integrar. Respeta las dependencias entre tareas del plan (p. ej. si el front necesita el endpoint de la API, la API va antes o se acuerda el contrato en el plan).
+4. Cuando terminen todos, comprueba que cada worktree tiene la suite en verde y el árbol limpio, y haz el cierre (Paso 5) una sola vez, reportando rama y worktree de cada agente. No fusiones las ramas entre sí salvo que el usuario lo pida.
 
 ## Paso 2: preparar el entorno de pruebas
 
@@ -86,10 +106,11 @@ Procesa las tareas **en el orden del plan**, una por una y sin saltarte ninguna.
 
 ## Paso 5: cierre
 
-1. Cuando todas las tareas estén en `[x]`, ejecuta la suite completa una última vez, y comprueba `git status` (árbol limpio).
+1. Cuando todas las tareas estén en `[x]`, ejecuta la suite completa una última vez, y comprueba `git status` (árbol limpio), en cada worktree si hay varios.
+   - **No elimines los worktrees** (`git worktree remove`) salvo que el usuario lo pida: contienen el trabajo para revisar.
 2. Cambia el campo **Estado** del plan a `completado` y haz un último commit (`docs(plan): marca el plan como completado`).
 3. **No hagas push ni abras PR** salvo que el usuario lo pida.
-4. Resume al usuario, en español: rama creada, tareas completadas (con sus commits), resultado de la suite, y cualquier desviación o duda pendiente.
+4. Resume al usuario, en español: rama y ruta del worktree creados (uno por agente/app si procede), tareas completadas (con sus commits), resultado de la suite, y cualquier desviación o duda pendiente.
 5. **Avisa por Slack** de que la implementación está lista para revisar, solo si todas las tareas están hechas y la suite está en verde:
    1. Obtén el ID del canal **`planes-ed8`** con `mcp__slack__slack_list_channels` (el servidor MCP pide el ID, no el nombre).
    2. Publica con `mcp__slack__slack_post_message` un mensaje breve en español con la rama, el plan, el nº de tareas/commits y el resultado de la suite. Ejemplo: `✅ La implementación del plan docs/plans/2026-10-15-filtro-por-nombre.md ya está lista para revisar en la rama feat/123-filtro-por-nombre (6 tareas, 24 tests en verde).`
