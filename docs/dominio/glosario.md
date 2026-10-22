@@ -17,6 +17,7 @@ Terminología del dominio y conceptos técnicos utilizados en el proyecto Restte
 | **DishIngredient** | Relación entre un plato y un ingrediente, con la cantidad necesaria. |
 | **Order** | Pedido realizado por un cliente. Contiene ítems (platos) y está asociado a un restaurante. |
 | **OrderItem** | Línea de un pedido: un plato con cantidad, notas opcionales y estado. |
+| **Table (mesa)** | Mesa de un restaurante. Tiene número (único en el restaurante), descripción opcional, capacidad en personas y estado. Un pedido puede asociarse a una mesa ocupada. |
 
 Dos particularidades del modelo que conviene tener presentes:
 
@@ -28,10 +29,10 @@ Dos particularidades del modelo que conviene tener presentes:
 | Rol | Descripción | Acceso |
 | --- | --- | --- |
 | **admin** | Administrador del sistema. Gestiona restaurantes, empleados y configuración. | web-admin |
-| **manager** | Gerente de restaurante. Gestiona los platos de su restaurante. | web-admin, web-empleados (todas las vistas) |
+| **manager** | Gerente de restaurante. Gestiona los platos y las mesas de su restaurante. | web-admin, web-empleados (todas las vistas) |
 | **cocinero** | Cocinero del restaurante. Prepara los pedidos. | web-empleados (cocina) |
-| **camarero** | Camarero del restaurante. Atiende barra y salón. | web-empleados (barra, salón) |
-| **cliente** | Cliente final. Hace pedidos. | web-clientes |
+| **camarero** | Camarero del restaurante. Atiende barra y salón y cambia el estado de las mesas. | web-empleados (barra, salón, mesas) |
+| **cliente** | Cliente final. Elige mesa y hace pedidos. | web-clientes |
 
 El valor almacenado es `manager`; "gerente" es solo su traducción en la interfaz. La columna **Acceso** describe lo que muestra el menú de cada app, no una restricción real: en `web-empleados` el filtrado por rol es de navegación y las tres vistas son accesibles por URL para cualquier usuario con sesión. Quien decide de verdad es el middleware `authorize()` de la API.
 
@@ -43,6 +44,16 @@ El valor almacenado es `manager`; "gerente" es solo su traducción en la interfa
 | **preparando** | Ítem siendo preparado en cocina. | cocinero |
 | **listo** | Ítem preparado, listo para servir. | cocinero |
 | **entregado** | Ítem entregado al cliente. Desaparece de las vistas activas. | camarero |
+
+### Estados de Mesa
+
+| Estado | Descripción | Quién lo cambia |
+| --- | --- | --- |
+| **libre** | La mesa puede elegirse. Es el estado inicial. | camarero o gerente (al liberarla, siempre a mano) |
+| **ocupada** | Hay clientes sentados. Solo se admiten pedidos con mesa si está ocupada. | cliente (al elegirla), camarero o gerente |
+| **reservada** | Apartada por el personal; no aparece como disponible para los clientes. | camarero o gerente |
+
+Las mesas no se liberan solas al entregar o pagar los pedidos: el camarero o el gerente las marca como `libre` desde la página **Mesas** de `web-empleados`.
 
 ### Categorías de Platos
 

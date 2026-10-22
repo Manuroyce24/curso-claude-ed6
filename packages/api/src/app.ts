@@ -10,6 +10,7 @@ import dishRoutes from '@routes/dish.routes.js'
 import publicRestaurantRoutes from '@routes/restaurant.public.routes.js'
 import publicDishRoutes from '@routes/dish.public.routes.js'
 import orderRoutes from '@routes/order.routes.js'
+import tableRoutes from '@routes/table.routes.js'
 import { errorHandler } from '@shared/infrastructure/http/errorHandler.js'
 
 const ORIGENES_POR_DEFECTO = 'http://localhost:4200,http://localhost:4201,http://localhost:4202'
@@ -34,6 +35,7 @@ app.use('/api/v1/restaurants', restaurantRoutes)
 app.use('/api/v1/restaurants/:restaurantId/ingredients', ingredientRoutes)
 app.use('/api/v1/restaurants/:restaurantId/dishes', dishRoutes)
 app.use('/api/v1/restaurants/:restaurantId/employees', restaurantEmployeeRoutes)
+app.use('/api/v1/restaurants/:restaurantId/tables', tableRoutes)
 
 app.get('/health', (_req, res) => {
     res.status(200).json({ status: 'ok' })

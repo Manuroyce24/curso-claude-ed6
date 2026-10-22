@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import type { Request, Response } from 'express'
 import { errorHandler } from './errorHandler.js'
-import { ForbiddenError } from '@errors/DomainErrors.js'
+import { ForbiddenError, TableNotFoundError, DuplicatedTableNumberError, TableNotAvailableError } from '@errors/DomainErrors.js'
 
 function fakeResponse() {
     const res = { status: vi.fn(), json: vi.fn() }
@@ -14,6 +14,18 @@ describe('errorHandler', () => {
         const res = fakeResponse()
         errorHandler(new ForbiddenError(), {} as Request, res as unknown as Response, vi.fn())
         expect(res.status).toHaveBeenCalledWith(403)
+    })
+
+    it('traduce TableNotFoundError a 404', () => {
+        const res = fakeResponse()
+        errorHandler(new TableNotFoundError(), {} as Request, res as unknown as Response, vi.fn())
+        expect(res.status).toHaveBeenCalledWith(404)
+    })
+
+    it.each([new DuplicatedTableNumberError(), new TableNotAvailableError()])('traduce %s a 409', (error) => {
+        const res = fakeResponse()
+        errorHandler(error, {} as Request, res as unknown as Response, vi.fn())
+        expect(res.status).toHaveBeenCalledWith(409)
     })
 })
 

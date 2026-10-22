@@ -3,6 +3,7 @@ import type { Order, OrderItem } from '@models/order.model.js'
 import { normalizeOrderStatus } from '@models/order.model.js'
 import type { OrderRepository } from '@repositories/order.repository.js'
 import type { DishRepository } from '@repositories/dish.repository.js'
+import type { TableRepository } from '@repositories/table.repository.js'
 import { RestaurantIdRequiredError, OrderNotFoundError, ForbiddenError, InvalidOrderError } from '@errors/DomainErrors.js'
 
 const MAX_LINEAS_PEDIDO = 50
@@ -32,7 +33,8 @@ export interface CreateOrderRequest {
 export class OrderService {
     constructor(
         private readonly orderRepository: OrderRepository,
-        private readonly dishRepository: DishRepository
+        private readonly dishRepository: DishRepository,
+        private readonly tableRepository: TableRepository
     ) {}
 
     async create(request: CreateOrderRequest): Promise<Order> {
@@ -40,6 +42,7 @@ export class OrderService {
             throw new RestaurantIdRequiredError()
         }
 
+        await this.validarMesa(request)
         await this.validarLineas(request)
 
         const items: OrderItem[] = []
@@ -67,6 +70,18 @@ export class OrderService {
         await this.orderRepository.create(order)
 
         return order
+    }
+
+    // Un pedido con mesa solo se admite si la mesa es del restaurante y está ocupada.
+    private async validarMesa(request: CreateOrderRequest): Promise<void> {
+        const tableId: unknown = request.tableId
+        if (tableId === null) return
+        const table = typeof tableId === 'string'
+            ? await this.tableRepository.findByIdInRestaurant(tableId, request.restaurantId)
+            : null
+        if (!table || table.status !== 'ocupada') {
+            throw new InvalidOrderError('Table is not occupied in this restaurant')
+        }
     }
 
     private async validarLineas(request: CreateOrderRequest): Promise<void> {

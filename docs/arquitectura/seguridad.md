@@ -18,6 +18,8 @@ Resumen de las medidas de seguridad de Resttek y de lo que debe configurar quien
 - Cada ruta autenticada declara los roles permitidos con `authorize([...])`.
 - **Aislamiento por restaurante**: `authorizeRestaurant` (y `authorizeRestaurantBy('id')`) solo deja pasar al `admin` o al personal cuyo `restaurantId` del token coincide con el de la URL. Los repositorios de platos e ingredientes buscan por `id` y `restaurant_id`.
 - **Pedidos** (`/orders`): el servicio recibe el *actor* del token. El restaurante se deduce del JWT y un pedido ajeno se responde como `404`. Los clientes solo ven sus propios pedidos.
+- **Mesas** (`/restaurants/:restaurantId/tables`): la gestión pasa por `authorizeRestaurant`; crear, editar y borrar es de `admin` y `manager`, y ver y cambiar el estado también del `camarero`. Las dos rutas del cliente (`GET /available` y `POST /:id/occupy`) solo exigen el rol `cliente`, porque su token no lleva restaurante; exponen únicamente mesas libres y la operación de ocupar. Ocupar es atómico (`UPDATE ... WHERE status = 'libre'`) para que dos clientes no se queden la misma mesa.
+- Al crear un pedido con mesa, la API exige que sea una mesa `ocupada` del mismo restaurante. No se guarda qué cliente ocupó la mesa: un cliente que conozca el `id` de una mesa ocupada por otro podría pedir en ella.
 - Los guards del frontend (`authGuard`, `roleGuard`) son solo una mejora de usabilidad: la barrera real es la API.
 
 ## Cabeceras y configuración HTTP de la API

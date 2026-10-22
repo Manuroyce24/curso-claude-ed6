@@ -41,3 +41,9 @@ export const crearPedido = async (id: string, restaurantId: string, clientId: st
         [itemId, id, dishId, 'pendiente']
     )
 }
+
+export const crearMesa = (id: string, restaurantId: string, number: number, capacity: number, status = 'libre') =>
+    dbConfig.run(
+        'INSERT INTO restaurant_tables (id, restaurant_id, number, description, capacity, status, created_at, updated_at) VALUES (?, ?, ?, NULL, ?, ?, ?, ?)',
+        [id, restaurantId, number, capacity, status, ahora, ahora]
+    )

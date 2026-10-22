@@ -52,16 +52,23 @@ src/app/
 ├── app.routes.ts
 ├── core/
 │   ├── layout/            → shell.component.ts
-│   ├── models/            → dish, order, restaurant
-│   ├── services/          → dish, order, restaurant
+│   ├── models/            → dish, order, restaurant, table
+│   ├── services/          → dish, order, restaurant, table
 │   └── store/             → cart.store.ts
 └── features/
     ├── cart/cart.component.ts
     ├── menu/restaurant-menu.component.ts
     ├── orders/my-orders.component.ts
     ├── orders/order-detail.component.ts
-    └── restaurants/restaurant-list.component.ts
+    ├── restaurants/restaurant-list.component.ts
+    └── tables/table-selection.component.ts
 ```
+
+### Mesas en cada aplicación
+
+- **`web-admin`** — feature `tables` (`/restaurants/:restaurantId/tables`): listado, alta y edición (`new`, `:id/edit`) y borrado con `TableStore`. Enlazada desde el menú lateral y el dashboard del restaurante.
+- **`web-empleados`** — feature `tables` con la página `/mesas` (camarero y manager, protegida con `roleGuard`). Muestra cada mesa con un selector de estado y, en las ocupadas, sus pedidos activos. No hay endpoint de pedidos por mesa: se reutiliza `OrderStore` (`GET /orders/active`) agrupando por `tableId`. Mesas y pedidos se refrescan cada 30 s.
+- **`web-clientes`** — el listado de restaurantes lleva a `/restaurants/:id/mesa` (`TableSelectionComponent`): el cliente indica el número de personas, elige una de las mesas libres y al continuar se ocupa y pasa a la carta. La mesa elegida se guarda en `CartStore` (con su restaurante y número) y en `sessionStorage`, para no perderla al recargar; la carta redirige a la selección si no hay mesa para ese restaurante, y el carrito la envía como `tableId` al confirmar el pedido.
 
 Ninguna de las tres aplicaciones tiene carpeta `shared/` propia: lo compartido vive en `@resttek/web-shared`.
 
@@ -333,6 +340,9 @@ export class ShellComponent {
         this.userRole() === 'camarero' || this.userRole() === 'manager'
     )
     readonly canSeeSalon = computed(() =>
+        this.userRole() === 'camarero' || this.userRole() === 'manager'
+    )
+    readonly canSeeMesas = computed(() =>
         this.userRole() === 'camarero' || this.userRole() === 'manager'
     )
 

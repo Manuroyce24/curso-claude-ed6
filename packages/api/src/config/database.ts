@@ -165,6 +165,19 @@ export class Database {
                 FOREIGN KEY(dish_id) REFERENCES dishes(id)
             );
 
+            CREATE TABLE IF NOT EXISTS restaurant_tables (
+                id TEXT PRIMARY KEY,
+                restaurant_id TEXT NOT NULL,
+                number INTEGER NOT NULL,
+                description TEXT,
+                capacity INTEGER NOT NULL,
+                status TEXT NOT NULL DEFAULT 'libre',
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                UNIQUE(restaurant_id, number),
+                FOREIGN KEY(restaurant_id) REFERENCES restaurants(id)
+            );
+
             CREATE TABLE IF NOT EXISTS refresh_tokens (
                 id TEXT PRIMARY KEY,
                 employee_id TEXT NOT NULL,
