@@ -130,7 +130,7 @@ Cada tarea debe poder hacerse en 5-10 minutos. En la API se trabaja con TDD (tes
 
 **API — servicio**
 
-- [ ] **T9** (~10 min): `TableService.create` (valida `number`, `capacity`, `description`, `status`; `DuplicatedTableNumberError` si el número existe) y `findByRestaurantId`; tests `table.service.test.ts` — `packages/api/src/services/table.service.ts`
+- [x] **T9** (~10 min): `TableService.create` (valida `number`, `capacity`, `description`, `status`; `DuplicatedTableNumberError` si el número existe) y `findByRestaurantId`; tests `table.service.test.ts` — `packages/api/src/services/table.service.ts`
 - [ ] **T10** (~10 min): `findById`, `update` (404 si no existe en el restaurante; duplicado solo si el número es de otra mesa) y `delete` (409 si está `ocupada`); tests — `packages/api/src/services/table.service.ts`
 - [ ] **T11** (~5 min): `changeStatus(restaurantId, id, status)`; tests de estado inválido y mesa inexistente — `packages/api/src/services/table.service.ts`
 - [ ] **T12** (~10 min): `findAvailable(restaurantId, people)` (valida entero 1-50 → `InvalidPartySizeError`) y `occupy(restaurantId, id)` (404/409 según el caso); tests — `packages/api/src/services/table.service.ts`
